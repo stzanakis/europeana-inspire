@@ -4,11 +4,8 @@ import eu.europeana.accessors.BoardAccessor;
 import eu.europeana.accessors.MeAccessor;
 import eu.europeana.common.AccessorsManager;
 import eu.europeana.common.Manager;
-import eu.europeana.common.SaveImageFromUrl;
 import eu.europeana.exceptions.BadRequest;
 import eu.europeana.exceptions.DoesNotExistException;
-import eu.europeana.model.Pin;
-import eu.europeana.model.PinsData;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.PropertiesConfigurationLayout;
 import org.apache.logging.log4j.LogManager;
@@ -18,6 +15,7 @@ import javax.naming.ConfigurationException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 /**
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
@@ -25,7 +23,7 @@ import java.io.IOException;
  */
 public class Main {
     private static final Logger logger = LogManager.getLogger();
-    public static void main(String[] args) throws IOException, ConfigurationException, org.apache.commons.configuration.ConfigurationException, BadRequest, DoesNotExistException {
+    public static void main(String[] args) throws IOException, ConfigurationException, org.apache.commons.configuration.ConfigurationException, BadRequest, DoesNotExistException, URISyntaxException {
         logger.info("Started in Main");
 
         //INITIALIZE START
@@ -68,18 +66,24 @@ public class Main {
 //        System.out.println(boardAccessor.getPinsFromBoard("simontzanakis", "Places"));
 //        System.out.println(boardAccessor.getPinsFromBoard(targetUser, targetBoard));
 
-        PinsData pinsFromBoard = boardAccessor.getPinsFromBoard(targetUser, targetBoard);
-        SaveImageFromUrl saveImageFromUrl = new SaveImageFromUrl(propertiesConfigurationInspire.getProperty(Manager.getStorageDirectoryKey()).toString());
 
-        for (Pin pin:
-        pinsFromBoard.getPins()) {
-            System.out.println(pin.getImage().getImage().getUrl());
-            System.out.println(pin.getImage().getImage().getWidth());
-            System.out.println(pin.getImage().getImage().getHeight());
+        System.out.println(meAccessor.getAllMyBoardsInternalName());
 
-            File file = saveImageFromUrl.saveImage(pin.getImage().getImage().getUrl());
-            System.out.println("Saved at: " + file);
-        }
+
+        //Get and store all pins from a specific board Start
+//        PinsData pinsFromBoard = boardAccessor.getPinsFromBoard(targetUser, targetBoard);
+//        SaveImageFromUrl saveImageFromUrl = new SaveImageFromUrl(propertiesConfigurationInspire.getProperty(Manager.getStorageDirectoryKey()).toString());
+//
+//        for (Pin pin:
+//        pinsFromBoard.getPins()) {
+//            System.out.println(pin.getImage().getImage().getUrl());
+//            System.out.println(pin.getImage().getImage().getWidth());
+//            System.out.println(pin.getImage().getImage().getHeight());
+//
+//            File file = saveImageFromUrl.saveImage(pin.getImage().getImage().getUrl());
+//            System.out.println("Saved at: " + file);
+//        }
+        //Get and store all pins from a specific board End
 
 
         //PLAYGROUND END
