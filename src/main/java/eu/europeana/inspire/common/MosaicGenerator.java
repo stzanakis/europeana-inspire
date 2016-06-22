@@ -12,6 +12,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -152,7 +153,9 @@ public class MosaicGenerator {
 
     private static Collection<Tile> getImagesFromTiles(File tilesDir) throws IOException {
         Collection<Tile> tileImages = Collections.synchronizedSet(new HashSet<Tile>());
-        File[] files = tilesDir.listFiles();
+
+        ArrayList<File> files = new ArrayList<File>();
+        getAllFilesFromSubdirectories(tilesDir, files);
         for(File file : files){
             BufferedImage img = ImageIO.read(file);
             if (img != null){
@@ -162,6 +165,18 @@ public class MosaicGenerator {
             }
         }
         return tileImages;
+    }
+
+    private static void getAllFilesFromSubdirectories(File directory, ArrayList<File> files) {
+        // get all the files from a directory
+        File[] fList = directory.listFiles();
+        for (File file : fList) {
+            if (file.isFile()) {
+                files.add(file);
+            } else if (file.isDirectory()) {
+                getAllFilesFromSubdirectories(file, files);
+            }
+        }
     }
 
     private static Collection<BufferedImagePart> getImagesFromInput(File inputImgFile) throws IOException {

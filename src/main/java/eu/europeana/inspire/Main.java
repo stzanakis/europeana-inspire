@@ -62,7 +62,8 @@ public class Main {
 
 
         //Generate Mosaic
-        String tilesDirectory = "/tmp/test/tiles-heroes-resize";
+//        String tilesDirectory = "/tmp/test/tiles-heroes-resize";
+        String tilesDirectory = "/tmp/europeana-inspire/100x100-size/heroes";
         String inputImage = "/tmp/test/europeana.png";
         String outputImage = "/tmp/test/output.png";
 
