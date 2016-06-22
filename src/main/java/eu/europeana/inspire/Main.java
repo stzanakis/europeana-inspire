@@ -8,6 +8,7 @@ import eu.europeana.common.SaveImageFromUrl;
 import eu.europeana.common.Tools;
 import eu.europeana.exceptions.BadRequest;
 import eu.europeana.exceptions.DoesNotExistException;
+import eu.europeana.inspire.common.Configuration;
 import eu.europeana.inspire.common.ImagesProcessor;
 import eu.europeana.model.Pin;
 import eu.europeana.model.PinsData;
@@ -48,24 +49,12 @@ public class Main {
 
         //Load Pinterest Configuration Start
         AccessorsManager am = new AccessorsManager(pinterestConfDirectory);
-        PropertiesConfiguration propertiesConfigurationPinterest = new PropertiesConfiguration();
-        PropertiesConfigurationLayout configurationPropertiesLayoutPinterest = new PropertiesConfigurationLayout(propertiesConfigurationPinterest);
-        File configurationFilePinterest = new File(am.getDefaultPropertiesPath() + "/" + AccessorsManager.getConfigurationFileName());
-        if (configurationFilePinterest.exists())
-            configurationPropertiesLayoutPinterest.load(new FileReader(configurationFilePinterest));
-        else
-            configurationPropertiesLayoutPinterest.load(new FileReader(Main.class.getClassLoader().getResource(AccessorsManager.getConfigurationFileName()).getFile()));
+        PropertiesConfiguration propertiesConfigurationPinterest = Configuration.loadConfiguration(AccessorsManager.getDefaultPropertiesPath(), AccessorsManager.getConfigurationFileName());
         //Load Pinterest Configuration End
 
         //Load Europeana Inspire Start
         Manager manager = new Manager(europeanaInspireConfDirectory);
-        PropertiesConfiguration propertiesConfigurationInspire = new PropertiesConfiguration();
-        PropertiesConfigurationLayout configurationPropertiesLayoutInspire = new PropertiesConfigurationLayout(propertiesConfigurationInspire);
-        File configurationFileInspire = new File(Manager.getDefaultPropertiesPath() + "/" + Manager.getConfigurationFileName());
-        if (configurationFileInspire.exists())
-            configurationPropertiesLayoutInspire.load(new FileReader(configurationFileInspire));
-        else
-            configurationPropertiesLayoutInspire.load(new FileReader(Main.class.getClassLoader().getResource(Manager.getConfigurationFileName()).getFile()));
+        PropertiesConfiguration propertiesConfigurationInspire = Configuration.loadConfiguration(Manager.getDefaultPropertiesPath(), Manager.getConfigurationFileName());
         //Load Europeana Inspire End
         rootStorageDirectory = propertiesConfigurationInspire.getProperty(Manager.getStorageDirectoryKey()).toString();
 
@@ -80,9 +69,6 @@ public class Main {
 
 //        System.out.println(boardAccessor.getBoardInformation("europeana", "Heroes"));
 //        System.out.println(boardAccessor.getPinsFromBoard("simontzanakis", "Places"));
-//        System.out.println(boardAccessor.getPinsFromBoard(targetUser, targetBoard));
-
-
 //        System.out.println(meAccessor.getAllMyBoardsInternalName());
 
 
