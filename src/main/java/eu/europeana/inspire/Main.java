@@ -6,10 +6,6 @@ import eu.europeana.common.AccessorsManager;
 import eu.europeana.common.Manager;
 import eu.europeana.exceptions.BadRequest;
 import eu.europeana.exceptions.DoesNotExistException;
-import eu.europeana.inspire.common.Configuration;
-import eu.europeana.inspire.common.ImagesProcessor;
-import eu.europeana.model.PinsData;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -35,14 +31,13 @@ public class Main {
 
         //Load Pinterest Configuration Start
         AccessorsManager am = new AccessorsManager(pinterestConfDirectory);
-        PropertiesConfiguration propertiesConfigurationPinterest = Configuration.loadConfiguration(AccessorsManager.getDefaultPropertiesPath(), AccessorsManager.getConfigurationFileName());
         //Load Pinterest Configuration End
 
         //Load Europeana Inspire Start
         Manager manager = new Manager(europeanaInspireConfDirectory);
         //Load Europeana Inspire End
 
-        am.initializeAllAccessors(propertiesConfigurationPinterest.getProperty(AccessorsManager.getAccessUrl_key()).toString());
+        am.initializeAllAccessors();
         MeAccessor meAccessor = am.getMeAccessor();
         BoardAccessor boardAccessor = am.getBoardAccessor();
         //INITIALIZE END
@@ -56,8 +51,12 @@ public class Main {
 
 
         //Get and store all pins from a specific board Start
-        PinsData pinsFromBoard = boardAccessor.getPinsFromBoard(targetUser, targetBoard);
-        ImagesProcessor.storeAllPins(manager.getRootStorageDirectory(), pinsFromBoard);
+//        PinsData pinsFromBoard = boardAccessor.getPinsFromBoard(targetUser, targetBoard);
+//        ImagesProcessor.storeAllPins(manager.getRootStorageDirectory(), pinsFromBoard);
+
+//        List<String> allMyBoardsInternalName = meAccessor.getAllMyBoardsInternalName();
+//        PinsData pinsFromBoard = boardAccessor.getAllPinsFromBoard(targetUser, allMyBoardsInternalName.get(0));
+//        ImagesProcessor.storeAllPins(manager.getRootStorageDirectory(), pinsFromBoard);
         //Get and store all pins from a specific board End
 
 

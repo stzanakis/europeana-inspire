@@ -31,7 +31,7 @@ public class ImagesProcessor {
     public static void storeAllPins(String rootStorageDirectory, PinsData pinsFromBoard) throws URISyntaxException, IOException {
         SaveImageFromUrl saveImageFromUrl = new SaveImageFromUrl(rootStorageDirectory);
 
-        String underDirectory = Tools.retrieveLastPathFromUrl(pinsFromBoard.getPins()[0].getBoard().getUrl());
+        String underDirectory = Tools.retrieveLastPathFromUrl(pinsFromBoard.getPins().get(0).getBoard().getUrl());
 
         for (Pin pin :
                 pinsFromBoard.getPins()) {
