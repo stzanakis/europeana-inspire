@@ -2,10 +2,7 @@ package eu.europeana;
 
 import eu.europeana.accessors.BoardAccessor;
 import eu.europeana.accessors.MeAccessor;
-import eu.europeana.common.AccessorsManager;
-import eu.europeana.common.Manager;
-import eu.europeana.common.SaveImageFromUrl;
-import eu.europeana.common.Tools;
+import eu.europeana.common.*;
 import eu.europeana.exceptions.BadRequest;
 import eu.europeana.exceptions.DoesNotExistException;
 import eu.europeana.model.Pin;
@@ -27,7 +24,7 @@ import java.net.URISyntaxException;
  */
 public class Main {
     private static final Logger logger = LogManager.getLogger();
-    public static void main(String[] args) throws IOException, ConfigurationException, org.apache.commons.configuration.ConfigurationException, BadRequest, DoesNotExistException, URISyntaxException {
+    public static void main(String[] args) throws IOException, ConfigurationException, org.apache.commons.configuration.ConfigurationException, BadRequest, DoesNotExistException, URISyntaxException, InterruptedException {
         logger.info("Started in Main");
 
         //INITIALIZE START
@@ -58,7 +55,7 @@ public class Main {
             configurationPropertiesLayoutInspire.load(new FileReader(Main.class.getClassLoader().getResource(Manager.getConfigurationFileName()).getFile()));
         //Load Europeana Inspire End
 
-        am.initializeAllAccessors(propertiesConfigurationInspire.getProperty(AccessorsManager.getAccessUrl_key()).toString());
+        am.initializeAllAccessors(propertiesConfigurationPinterest.getProperty(AccessorsManager.getAccessUrl_key()).toString());
         MeAccessor meAccessor = am.getMeAccessor();
         BoardAccessor boardAccessor = am.getBoardAccessor();
         //INITIALIZE END
@@ -92,6 +89,12 @@ public class Main {
         //Get and store all pins from a specific board End
 
 
+        //Generate Mosaic
+        String tilesDirectory= "/tmp/test/tiles-heroes-resize";
+        String inputImage = "/tmp/test/europeana.png";
+        String outputImage = "/tmp/test/output.png";
+        MosaicGenerator mosaicGenerator = new MosaicGenerator(tilesDirectory, inputImage, outputImage);
+        mosaicGenerator.generateMosaic();
         //PLAYGROUND END
 
 

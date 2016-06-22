@@ -18,9 +18,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MosaicGenerator {
-    private static final String TILES_DIR = "/tmp/test/tiles-heroes-resize";
-    private static final String INPUT_IMG = "/tmp/test/europeana.png";
-    private static final String OUTPUT_IMG = "/tmp/test/output.png";
+    private String tiles_dir = "/tmp/test/tiles-heroes-resize";
+    private String input_img = "/tmp/test/europeana.png";
+    private String output_img = "/tmp/test/output.png";
     private static final int TILE_WIDTH = 100;
     private static final int TILE_HEIGHT = 100;
     private static final int TILE_SCALE = 14;
@@ -31,12 +31,21 @@ public class MosaicGenerator {
         System.out.println(msg);
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public MosaicGenerator() {
+    }
+
+    public MosaicGenerator(String tiles_dir, String input_img, String output_img) {
+        this.tiles_dir = tiles_dir;
+        this.input_img = input_img;
+        this.output_img = output_img;
+    }
+
+    public void generateMosaic() throws IOException, InterruptedException {
         log("Reading tiles...");
-        final Collection<Tile> tileImages = getImagesFromTiles(new File(TILES_DIR));
+        final Collection<Tile> tileImages = getImagesFromTiles(new File(tiles_dir));
 
         log("Processing input image...");
-        File inputImageFile = new File(INPUT_IMG);
+        File inputImageFile = new File(input_img);
         Collection<BufferedImagePart> inputImageParts = getImagesFromInput(inputImageFile);
         final Collection<BufferedImagePart> outputImageParts = Collections.synchronizedSet(new HashSet<BufferedImagePart>());
 
@@ -62,7 +71,7 @@ public class MosaicGenerator {
         int width = inputImage.getWidth();
         int height = inputImage.getHeight();
         BufferedImage output = makeOutputImage(width, height, outputImageParts);
-        ImageIO.write(output, "png", new File(OUTPUT_IMG));
+        ImageIO.write(output, "png", new File(output_img));
         log("FINISHED");
     }
 
