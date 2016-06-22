@@ -1,34 +1,21 @@
-package eu.europeana;
+package eu.europeana.inspire;
 
 import eu.europeana.accessors.BoardAccessor;
 import eu.europeana.accessors.MeAccessor;
 import eu.europeana.common.AccessorsManager;
 import eu.europeana.common.Manager;
-import eu.europeana.common.SaveImageFromUrl;
-import eu.europeana.common.Tools;
 import eu.europeana.exceptions.BadRequest;
 import eu.europeana.exceptions.DoesNotExistException;
 import eu.europeana.inspire.common.Configuration;
 import eu.europeana.inspire.common.ImagesProcessor;
-import eu.europeana.model.Pin;
 import eu.europeana.model.PinsData;
-import net.coobird.thumbnailator.Thumbnails;
-import net.coobird.thumbnailator.resizers.configurations.Antialiasing;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.configuration.PropertiesConfigurationLayout;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.imageio.ImageIO;
 import javax.naming.ConfigurationException;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
@@ -36,7 +23,6 @@ import java.nio.file.Paths;
  */
 public class Main {
     private static final Logger logger = LogManager.getLogger();
-    private static String rootStorageDirectory;
 
     public static void main(String[] args) throws IOException, ConfigurationException, org.apache.commons.configuration.ConfigurationException, BadRequest, DoesNotExistException, URISyntaxException, InterruptedException {
         logger.info("Started in Main");
@@ -54,14 +40,11 @@ public class Main {
 
         //Load Europeana Inspire Start
         Manager manager = new Manager(europeanaInspireConfDirectory);
-        PropertiesConfiguration propertiesConfigurationInspire = Configuration.loadConfiguration(Manager.getDefaultPropertiesPath(), Manager.getConfigurationFileName());
         //Load Europeana Inspire End
-        rootStorageDirectory = propertiesConfigurationInspire.getProperty(Manager.getStorageDirectoryKey()).toString();
 
         am.initializeAllAccessors(propertiesConfigurationPinterest.getProperty(AccessorsManager.getAccessUrl_key()).toString());
         MeAccessor meAccessor = am.getMeAccessor();
         BoardAccessor boardAccessor = am.getBoardAccessor();
-
         //INITIALIZE END
 
 
@@ -74,7 +57,7 @@ public class Main {
 
         //Get and store all pins from a specific board Start
         PinsData pinsFromBoard = boardAccessor.getPinsFromBoard(targetUser, targetBoard);
-        ImagesProcessor.storeAllPins(rootStorageDirectory, pinsFromBoard);
+        ImagesProcessor.storeAllPins(manager.getRootStorageDirectory(), pinsFromBoard);
         //Get and store all pins from a specific board End
 
 

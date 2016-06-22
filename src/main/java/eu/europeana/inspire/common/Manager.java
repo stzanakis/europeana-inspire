@@ -1,7 +1,12 @@
 package eu.europeana.common;
 
+import eu.europeana.inspire.common.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.io.FileNotFoundException;
 
 /**
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
@@ -13,9 +18,12 @@ public class Manager {
     private final static String configurationFileName = "configuration-inspire.properties";
     private final static String storageDirectoryKey = "storageDirectory";
     private static String defaultPropertiesPath;
+    private String rootStorageDirectory;
 
-    public Manager(String defaultPropertiesPath) {
+    public Manager(String defaultPropertiesPath) throws FileNotFoundException, ConfigurationException {
         this.defaultPropertiesPath = defaultPropertiesPath;
+        PropertiesConfiguration propertiesConfigurationInspire = Configuration.loadConfiguration(Manager.getDefaultPropertiesPath(), Manager.getConfigurationFileName());
+        rootStorageDirectory = propertiesConfigurationInspire.getProperty(Manager.getStorageDirectoryKey()).toString();
     }
 
     public static Logger getLogger() {
@@ -36,5 +44,9 @@ public class Manager {
 
     public static String getStorageDirectoryKey() {
         return storageDirectoryKey;
+    }
+
+    public String getRootStorageDirectory() {
+        return rootStorageDirectory;
     }
 }
