@@ -40,7 +40,7 @@ public class ImagesProcessor {
 //            System.out.println(pin.getImage().getImage().getHeight());
 
             File file = saveImageFromUrl.saveImage(underDirectory, pin.getImage().getImage().getUrl());
-            System.out.println("Saved at: " + file);
+            logger.info("Saved at: " + file);
             //Create required directories
             String subTreeFile = file.toString().substring(Paths.get(rootStorageDirectory, "original-size").toString().length() + 1);
             String subTreeDirectory = Paths.get(subTreeFile).getParent().toString();
