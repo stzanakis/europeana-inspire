@@ -2,7 +2,10 @@ package eu.europeana;
 
 import eu.europeana.accessors.BoardAccessor;
 import eu.europeana.accessors.MeAccessor;
-import eu.europeana.common.*;
+import eu.europeana.common.AccessorsManager;
+import eu.europeana.common.Manager;
+import eu.europeana.common.SaveImageFromUrl;
+import eu.europeana.common.Tools;
 import eu.europeana.exceptions.BadRequest;
 import eu.europeana.exceptions.DoesNotExistException;
 import eu.europeana.model.Pin;
@@ -24,6 +27,9 @@ import java.net.URISyntaxException;
  */
 public class Main {
     private static final Logger logger = LogManager.getLogger();
+    private static final String directory100x100 = "100x100-size";
+    private static final String directory60x60 = "60x60-size";
+    private static final String directory40x40 = "40x40-size";
     public static void main(String[] args) throws IOException, ConfigurationException, org.apache.commons.configuration.ConfigurationException, BadRequest, DoesNotExistException, URISyntaxException, InterruptedException {
         logger.info("Started in Main");
 
@@ -75,15 +81,15 @@ public class Main {
         PinsData pinsFromBoard = boardAccessor.getPinsFromBoard(targetUser, targetBoard);
         SaveImageFromUrl saveImageFromUrl = new SaveImageFromUrl(propertiesConfigurationInspire.getProperty(Manager.getStorageDirectoryKey()).toString());
 
-        String targetDirectory = Tools.retrieveLastPathFromUrl(pinsFromBoard.getPins()[0].getBoard().getUrl());
+        String underDirectory = Tools.retrieveLastPathFromUrl(pinsFromBoard.getPins()[0].getBoard().getUrl());
 
         for (Pin pin:
         pinsFromBoard.getPins()) {
-            System.out.println(pin.getImage().getImage().getUrl());
-            System.out.println(pin.getImage().getImage().getWidth());
-            System.out.println(pin.getImage().getImage().getHeight());
+//            System.out.println(pin.getImage().getImage().getUrl());
+//            System.out.println(pin.getImage().getImage().getWidth());
+//            System.out.println(pin.getImage().getImage().getHeight());
 
-            File file = saveImageFromUrl.saveImage(targetDirectory, pin.getImage().getImage().getUrl());
+            File file = saveImageFromUrl.saveImage(underDirectory, pin.getImage().getImage().getUrl());
             System.out.println("Saved at: " + file);
         }
         //Get and store all pins from a specific board End
@@ -93,8 +99,31 @@ public class Main {
         String tilesDirectory= "/tmp/test/tiles-heroes-resize";
         String inputImage = "/tmp/test/europeana.png";
         String outputImage = "/tmp/test/output.png";
-        MosaicGenerator mosaicGenerator = new MosaicGenerator(tilesDirectory, inputImage, outputImage);
-        mosaicGenerator.generateMosaic();
+
+//        MosaicGenerator mosaicGenerator = new MosaicGenerator(tilesDirectory, inputImage, outputImage);
+//        mosaicGenerator.generateMosaic();
+
+
+
+        //Resizing images
+        String testImage = "/tmp/heroes-test.jpg";
+        String testImageResize = "/tmp/heroes-test-resize.jpg";
+//        File folder = new File("/Users/me/Desktop/images/");
+//        Thumbnails.of(folder.listFiles())
+//                .size(112, 75)
+//                .outputFormat("jpg").
+//                .toFiles(Rename.PREFIX_DOT_THUMBNAIL);
+
+//        BufferedImage thumbnail =
+//                Thumbnails.of(new File(testImage))
+//                        .forceSize(100, 100)
+//                        .antialiasing(Antialiasing.ON)
+//                        .outputQuality(1.0f)
+//                        .asBufferedImage();
+//
+//        ImageIO.write(thumbnail, "jpg", new File(testImageResize));
+
+
         //PLAYGROUND END
 
 
@@ -104,4 +133,5 @@ public class Main {
 
         logger.info("Ended in Main");
     }
+
 }

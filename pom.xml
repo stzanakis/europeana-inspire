@@ -17,6 +17,7 @@
         <commons-configuration.version>1.10</commons-configuration.version>
         <commons-io.version>1.3.2</commons-io.version>
         <httpcore.version>4.4.4</httpcore.version>
+        <thumbnailator.version>0.4.8</thumbnailator.version>
     </properties>
 
     <dependencies>
@@ -67,6 +68,11 @@
             <artifactId>httpcore</artifactId>
             <version>${httpcore.version}</version>
         </dependency>
+        <dependency>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+            <version>${thumbnailator.version}</version>
+        </dependency>
         <!--Others End-->
 
         <!--Test Start-->
@@ -78,5 +84,5 @@
         </dependency>
         <!--Test End-->
     </dependencies>
-    
+
 </project>
