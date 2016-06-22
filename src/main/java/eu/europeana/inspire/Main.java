@@ -6,6 +6,7 @@ import eu.europeana.common.AccessorsManager;
 import eu.europeana.common.Manager;
 import eu.europeana.exceptions.BadRequest;
 import eu.europeana.exceptions.DoesNotExistException;
+import eu.europeana.inspire.common.MosaicGenerator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -61,12 +62,12 @@ public class Main {
 
 
         //Generate Mosaic
-//        String tilesDirectory = "/tmp/test/tiles-heroes-resize";
-//        String inputImage = "/tmp/test/europeana.png";
-//        String outputImage = "/tmp/test/output.png";
+        String tilesDirectory = "/tmp/test/tiles-heroes-resize";
+        String inputImage = "/tmp/test/europeana.png";
+        String outputImage = "/tmp/test/output.png";
 
-//        MosaicGenerator mosaicGenerator = new MosaicGenerator(tilesDirectory, inputImage, outputImage);
-//        mosaicGenerator.generateMosaic();
+        MosaicGenerator mosaicGenerator = new MosaicGenerator(tilesDirectory, inputImage, outputImage, 100, 100, 14);
+        mosaicGenerator.generateMosaic();
         //PLAYGROUND END
 
 

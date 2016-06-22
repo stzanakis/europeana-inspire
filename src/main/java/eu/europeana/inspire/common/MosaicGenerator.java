@@ -1,9 +1,12 @@
-package eu.europeana.common;
+package eu.europeana.inspire.common;
 
 /**
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2016-06-21
  */
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -18,33 +21,33 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MosaicGenerator {
+    private static final Logger logger = LogManager.getLogger();
     private String tiles_dir = "/tmp/test/tiles-heroes-resize";
     private String input_img = "/tmp/test/europeana.png";
     private String output_img = "/tmp/test/output.png";
-    private static final int TILE_WIDTH = 100;
-    private static final int TILE_HEIGHT = 100;
-    private static final int TILE_SCALE = 14;
+    private static int tileWidth = 100;
+    private static int tileHeight = 100;
+    private static int tileScale = 14;
     private static final boolean IS_BW = false;
     private static final int THREADS = 2;
-
-    private static void log(String msg){
-        System.out.println(msg);
-    }
 
     public MosaicGenerator() {
     }
 
-    public MosaicGenerator(String tiles_dir, String input_img, String output_img) {
+    public MosaicGenerator(String tiles_dir, String input_img, String output_img, int tileWidth, int tileHeight, int tileScale) {
         this.tiles_dir = tiles_dir;
         this.input_img = input_img;
         this.output_img = output_img;
+        MosaicGenerator.tileWidth = tileWidth;
+        MosaicGenerator.tileHeight = tileHeight;
+        MosaicGenerator.tileScale = tileScale;
     }
 
     public void generateMosaic() throws IOException, InterruptedException {
-        log("Reading tiles...");
+        logger.info("Reading tiles...");
         final Collection<Tile> tileImages = getImagesFromTiles(new File(tiles_dir));
 
-        log("Processing input image...");
+        logger.info("Processing input image...");
         File inputImageFile = new File(input_img);
         Collection<BufferedImagePart> inputImageParts = getImagesFromInput(inputImageFile);
         final Collection<BufferedImagePart> outputImageParts = Collections.synchronizedSet(new HashSet<BufferedImagePart>());
@@ -57,7 +60,7 @@ public class MosaicGenerator {
             newFixedThreadPool.execute(new Runnable(){
                 public void run() {
                     Tile bestFitTile = getBestFitTile(inputImagePart.image, tileImages);
-                    log(String.format("Matching part %s of %s", i.incrementAndGet(), partCount));
+                    logger.info(String.format("Matching part %s of %s", i.incrementAndGet(), partCount));
                     outputImageParts.add(new BufferedImagePart(bestFitTile.image, inputImagePart.x, inputImagePart.y));
                 }
             });
@@ -66,20 +69,20 @@ public class MosaicGenerator {
         newFixedThreadPool.shutdown();
         newFixedThreadPool.awaitTermination(10000000, TimeUnit.SECONDS);
 
-        log("Writing output image...");
+        logger.info("Writing output image...");
         BufferedImage inputImage = ImageIO.read(inputImageFile);
         int width = inputImage.getWidth();
         int height = inputImage.getHeight();
         BufferedImage output = makeOutputImage(width, height, outputImageParts);
         ImageIO.write(output, "png", new File(output_img));
-        log("FINISHED");
+        logger.info("FINISHED");
     }
 
     private static BufferedImage makeOutputImage(int width, int height, Collection<BufferedImagePart> parts){
-        BufferedImage image = new BufferedImage(width * TILE_SCALE, height * TILE_SCALE, BufferedImage.TYPE_3BYTE_BGR);
+        BufferedImage image = new BufferedImage(width * tileScale, height * tileScale, BufferedImage.TYPE_3BYTE_BGR);
 
         for(BufferedImagePart part : parts){
-            BufferedImage imagePart = image.getSubimage(part.x * TILE_SCALE, part.y * TILE_SCALE, TILE_WIDTH, TILE_HEIGHT);
+            BufferedImage imagePart = image.getSubimage(part.x * tileScale, part.y * tileScale, tileWidth, tileHeight);
             imagePart.setData(part.image.getData());
         }
 
@@ -183,8 +186,8 @@ public class MosaicGenerator {
     }
 
     public static class Tile {
-        public static int SCALED_WIDTH = TILE_WIDTH / TILE_SCALE;
-        public static int SCALED_HEIGHT = TILE_HEIGHT / TILE_SCALE;
+        public static int SCALED_WIDTH = tileWidth / tileScale;
+        public static int SCALED_HEIGHT = tileHeight / tileScale;
         public Pixel[][] pixels = new Pixel[SCALED_WIDTH][SCALED_HEIGHT];
         public BufferedImage image;
 
@@ -196,7 +199,7 @@ public class MosaicGenerator {
         private void calcPixels(){
             for(int x=0; x<SCALED_WIDTH; x++){
                 for(int y=0; y<SCALED_HEIGHT; y++){
-                    pixels[x][y] = calcPixel(x * TILE_SCALE, y * TILE_SCALE, TILE_SCALE, TILE_SCALE);
+                    pixels[x][y] = calcPixel(x * tileScale, y * tileScale, tileScale, tileScale);
                 }
             }
         }
