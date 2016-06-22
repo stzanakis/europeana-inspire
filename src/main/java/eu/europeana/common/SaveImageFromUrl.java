@@ -17,26 +17,25 @@ import java.nio.file.Paths;
 public class SaveImageFromUrl {
     private static final Logger logger = LogManager.getLogger();
     private String defaultDirectoryOfSavedImages;
+    private final String originalDir = "original-size";
 
     public SaveImageFromUrl(String defaultDirectoryOfSavedImages) {
         this.defaultDirectoryOfSavedImages = defaultDirectoryOfSavedImages;
     }
 
-    public File saveImage(String imageUrl, String destinationFile) throws IOException {
+    public File saveImage(String underDirectory, String imageUrl, String destinationFile) throws IOException {
         String file = Paths.get(defaultDirectoryOfSavedImages, destinationFile).toString();
         return downLoadImage(imageUrl, file);
     }
 
-    public File saveImage(String imageUrl) throws IOException {
+    public File saveImage(String underDirectory, String imageUrl) throws IOException {
         String path = parsePathFromUrl(imageUrl);
-        Files.createDirectories(Paths.get(defaultDirectoryOfSavedImages, path));
+        Files.createDirectories(Paths.get(defaultDirectoryOfSavedImages, originalDir, underDirectory, path));
 
         String fullName = FilenameUtils.getName(imageUrl);
-//        String baseFileName = FilenameUtils.getBaseName(imageUrl);
-//        String fileExtension = FilenameUtils.getExtension(imageUrl);
 
         Path newFilePath = Paths.get(path, fullName);
-        String file = Paths.get(defaultDirectoryOfSavedImages, newFilePath.toString()).toString();
+        String file = Paths.get(defaultDirectoryOfSavedImages, originalDir, underDirectory, newFilePath.toString()).toString();
         File destinationFile = new File(file);
         if(destinationFile.exists()) {
             logger.info("Did not re-download, image already exists!");

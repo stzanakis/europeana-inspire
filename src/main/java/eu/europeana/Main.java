@@ -4,8 +4,12 @@ import eu.europeana.accessors.BoardAccessor;
 import eu.europeana.accessors.MeAccessor;
 import eu.europeana.common.AccessorsManager;
 import eu.europeana.common.Manager;
+import eu.europeana.common.SaveImageFromUrl;
+import eu.europeana.common.Tools;
 import eu.europeana.exceptions.BadRequest;
 import eu.europeana.exceptions.DoesNotExistException;
+import eu.europeana.model.Pin;
+import eu.europeana.model.PinsData;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.PropertiesConfigurationLayout;
 import org.apache.logging.log4j.LogManager;
@@ -36,9 +40,9 @@ public class Main {
         AccessorsManager am = new AccessorsManager(pinterestConfDirectory);
         PropertiesConfiguration propertiesConfigurationPinterest = new PropertiesConfiguration();
         PropertiesConfigurationLayout configurationPropertiesLayoutPinterest = new PropertiesConfigurationLayout(propertiesConfigurationPinterest);
-        File credentialsFile = new File(am.getDefaultPropertiesPath() + "/" + AccessorsManager.getConfigurationFileName());
-        if(credentialsFile.exists())
-            configurationPropertiesLayoutPinterest.load(new FileReader(credentialsFile));
+        File configurationFilePinterest = new File(am.getDefaultPropertiesPath() + "/" + AccessorsManager.getConfigurationFileName());
+        if(configurationFilePinterest.exists())
+            configurationPropertiesLayoutPinterest.load(new FileReader(configurationFilePinterest));
         else
             configurationPropertiesLayoutPinterest.load(new FileReader(Main.class.getClassLoader().getResource(AccessorsManager.getConfigurationFileName()).getFile()));
         //Load Pinterest Configuration End
@@ -67,22 +71,24 @@ public class Main {
 //        System.out.println(boardAccessor.getPinsFromBoard(targetUser, targetBoard));
 
 
-        System.out.println(meAccessor.getAllMyBoardsInternalName());
+//        System.out.println(meAccessor.getAllMyBoardsInternalName());
 
 
         //Get and store all pins from a specific board Start
-//        PinsData pinsFromBoard = boardAccessor.getPinsFromBoard(targetUser, targetBoard);
-//        SaveImageFromUrl saveImageFromUrl = new SaveImageFromUrl(propertiesConfigurationInspire.getProperty(Manager.getStorageDirectoryKey()).toString());
-//
-//        for (Pin pin:
-//        pinsFromBoard.getPins()) {
-//            System.out.println(pin.getImage().getImage().getUrl());
-//            System.out.println(pin.getImage().getImage().getWidth());
-//            System.out.println(pin.getImage().getImage().getHeight());
-//
-//            File file = saveImageFromUrl.saveImage(pin.getImage().getImage().getUrl());
-//            System.out.println("Saved at: " + file);
-//        }
+        PinsData pinsFromBoard = boardAccessor.getPinsFromBoard(targetUser, targetBoard);
+        SaveImageFromUrl saveImageFromUrl = new SaveImageFromUrl(propertiesConfigurationInspire.getProperty(Manager.getStorageDirectoryKey()).toString());
+
+        String targetDirectory = Tools.retrieveLastPathFromUrl(pinsFromBoard.getPins()[0].getBoard().getUrl());
+
+        for (Pin pin:
+        pinsFromBoard.getPins()) {
+            System.out.println(pin.getImage().getImage().getUrl());
+            System.out.println(pin.getImage().getImage().getWidth());
+            System.out.println(pin.getImage().getImage().getHeight());
+
+            File file = saveImageFromUrl.saveImage(targetDirectory, pin.getImage().getImage().getUrl());
+            System.out.println("Saved at: " + file);
+        }
         //Get and store all pins from a specific board End
 
 

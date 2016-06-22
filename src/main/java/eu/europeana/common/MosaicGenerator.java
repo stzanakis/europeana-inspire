@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class MosaicGenerator {
     private static final String TILES_DIR = "/tmp/test/tiles-heroes-resize";
-    private static final String INPUT_IMG = "/tmp/test/input.jpg";
+    private static final String INPUT_IMG = "/tmp/test/europeana.png";
     private static final String OUTPUT_IMG = "/tmp/test/output.png";
     private static final int TILE_WIDTH = 100;
     private static final int TILE_HEIGHT = 100;
