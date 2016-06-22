@@ -46,6 +46,14 @@ public class Main {
 
         //PLAYGROUND START
 
+//        TestTerminal.executeCommands();
+
+//        ProcessBuilder pb = new ProcessBuilder("ls");
+//        pb.inheritIO();
+//        pb.directory(new File("/tmp"));
+//        pb.redirectOutput(ProcessBuilder.Redirect.appendTo(new File("/tmp/test.txt")));
+//        pb.start();
+
 //        System.out.println(boardAccessor.getBoardInformation("europeana", "Heroes"));
 //        System.out.println(boardAccessor.getPinsFromBoard("simontzanakis", "Places"));
 //        System.out.println(meAccessor.getAllMyBoardsInternalName());
@@ -56,19 +64,42 @@ public class Main {
 //        ImagesProcessor.storeAllPins(manager.getRootStorageDirectory(), pinsFromBoard);
 
 //        List<String> allMyBoardsInternalName = meAccessor.getAllMyBoardsInternalName();
-//        PinsData pinsFromBoard = boardAccessor.getAllPinsFromBoard(targetUser, allMyBoardsInternalName.get(0));
+//        PinsData pinsFromBoard = boardAccessor.getAllPinsFromBoard(targetUser, allMyBoardsInternalName.get(1));
 //        ImagesProcessor.storeAllPins(manager.getRootStorageDirectory(), pinsFromBoard);
+
+//        for (String boardName :
+//                allMyBoardsInternalName) {
+//            PinsData pinsFromBoard = boardAccessor.getAllPinsFromBoard(targetUser, boardName);
+//            ImagesProcessor.storeAllPins(manager.getRootStorageDirectory(), pinsFromBoard);
+//
+//        }
+        //Generate until you fail...
+        String inputImage = "/tmp/test/input2.jpg";
+        String outputImage = "/tmp/test/output.png";
+
+//        use100x100(inputImage, outputImage);
+//        use60x60(inputImage, outputImage);
+//        use40x40(inputImage, outputImage);
         //Get and store all pins from a specific board End
 
 
         //Generate Mosaic
 //        String tilesDirectory = "/tmp/test/tiles-heroes-resize";
-        String tilesDirectory = "/tmp/europeana-inspire/100x100-size/heroes";
-        String inputImage = "/tmp/test/europeana.png";
-        String outputImage = "/tmp/test/output.png";
+//        int size = 40;
+//        int scale = 10;
+//        String tilesDirectory = "/tmp/europeana-inspire/100x100-size/heroes";
+//        String inputImage = "/tmp/test/input2.jpg";
+//        String outputImage = "/tmp/test/output.png";
+//
+//        MosaicGenerator mosaicGenerator = new MosaicGenerator(tilesDirectory, inputImage, outputImage, size, size, scale);
+//        mosaicGenerator.generateMosaic();
 
-        MosaicGenerator mosaicGenerator = new MosaicGenerator(tilesDirectory, inputImage, outputImage, 100, 100, 14);
-        mosaicGenerator.generateMosaic();
+//        String inputImage = "/tmp/test/input2.jpg";
+//        String outputImage = "/tmp/test/output.png";
+//
+////        use100x100(inputImage, outputImage);
+////        use60x60(inputImage, outputImage);
+//        use40x40(inputImage, outputImage);
         //PLAYGROUND END
 
 
@@ -79,6 +110,32 @@ public class Main {
         logger.info("Ended in Main");
     }
 
+    private static void use100x100(String inputImage, String outputImage) throws IOException, InterruptedException {
+        int scale = 4;
+        int size = 100;
+        String tilesDirectory = "/tmp/europeana-inspire/100x100-size/heroes";
+        logger.info("100x100 processing..");
+        MosaicGenerator mosaicGenerator = new MosaicGenerator(tilesDirectory, inputImage, outputImage, size, size, scale);
+        mosaicGenerator.generateMosaic();
+    }
+
+    private static void use60x60(String inputImage, String outputImage) throws IOException, InterruptedException {
+        int scale = 8;
+        int size = 60;
+        String tilesDirectory = "/tmp/europeana-inspire/60x60-size";
+        logger.info("60x60 processing..");
+        MosaicGenerator mosaicGenerator = new MosaicGenerator(tilesDirectory, inputImage, outputImage, size, size, scale);
+        mosaicGenerator.generateMosaic();
+    }
+
+    private static void use40x40(String inputImage, String outputImage) throws IOException, InterruptedException {
+        int scale = 10;
+        int size = 40;
+        String tilesDirectory = "/tmp/europeana-inspire/40x40-size";
+        logger.info("40x40 processing..");
+        MosaicGenerator mosaicGenerator = new MosaicGenerator(tilesDirectory, inputImage, outputImage, size, size, scale);
+        mosaicGenerator.generateMosaic();
+    }
 
 
 }
