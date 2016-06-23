@@ -15,16 +15,23 @@ import java.io.IOException;
  */
 public class ServletContext implements ServletContextListener
 {
+    public static Manager manager;
+    public static String targetUser = "europeana";
+    public static String hardcodedUrl = "http://chaos.eanadev.org:8080";
+
     public void contextInitialized(ServletContextEvent arg0)
     {
         String pinterestConfDirectory = "/data/credentials/pinterest-client";
         String europeanaInspireConfDirectory = "/data/credentials/europeana-inspire";
         //Load Pinterest Configuration Start
         try {
+            manager = new Manager(europeanaInspireConfDirectory, pinterestConfDirectory);
             Manager.accessorsManager = new AccessorsManager(pinterestConfDirectory);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (ConfigurationException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
         //Load Pinterest Configuration End

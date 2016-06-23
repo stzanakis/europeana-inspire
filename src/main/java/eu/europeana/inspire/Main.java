@@ -15,7 +15,6 @@ import org.apache.logging.log4j.Logger;
 import javax.naming.ConfigurationException;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -124,12 +123,12 @@ public class Main {
         logger.info("Ended in Main");
     }
 
-    private static void getImagesAndgenerateMyMosaic(int scale, int size, String boardName, String sourceImage) throws BadRequest, DoesNotExistException, IOException, URISyntaxException {
+    public static String getImagesAndgenerateMyMosaic(int scale, int size, String boardName, String sourceImage) throws BadRequest, DoesNotExistException, IOException, URISyntaxException {
         String targetBoard = boardName;
         String scaleSubdirectory = null;
         if(scale > 8 ) {
             logger.error("Available scales: <= 8");
-            return;
+            return null;
         }
         switch (size)
         {
@@ -144,7 +143,7 @@ public class Main {
                 break;
             default: {
                 logger.error("Available sizes : 100, 60, 40");
-                return;
+                return null;
             }
         }
 
@@ -167,6 +166,8 @@ public class Main {
         String output = Paths.get(mosaicsDirectory.toString(), outputFileName).toString();
 
         MosaicGeneratorBash.generateMosaic(scale, size, size, sourceTilesDirectory, sourceImage, output, (short) 10);
+
+        return output;
     }
 
     private static void generateMyMosaic(int scale, int size, String boardName, String sourceImage) throws BadRequest, DoesNotExistException, IOException, URISyntaxException {
@@ -193,13 +194,18 @@ public class Main {
             }
         }
 
-        String outputFileName = size + "x" + size + "-" + Tools.retrieveLastPathFromUrl(sourceImage);
-        String sourceImageDirectory = Paths.get(manager.getRootStorageDirectory(), scaleSubdirectory, boardName).toString();
+        //Generate mosaic
+        String outputFileName = scale + "-" + size + "x" + size + "-" + Tools.retrieveLastPathFromUrl(sourceImage);
+        String sourceTilesDirectory;
+        if(!targetBoard.equals("all-boards"))
+            sourceTilesDirectory = Paths.get(manager.getRootStorageDirectory(), scaleSubdirectory, boardName).toString();
+        else
+            sourceTilesDirectory = Paths.get(manager.getRootStorageDirectory(), scaleSubdirectory).toString();
+
         Path mosaicsDirectory = Paths.get(manager.getRootStorageDirectory(), ImagesProcessor.directoryMosaicsName);
-        Files.createDirectories(mosaicsDirectory);
         String output = Paths.get(mosaicsDirectory.toString(), outputFileName).toString();
 
-        MosaicGeneratorBash.generateMosaic(scale, size, size, sourceImageDirectory, sourceImage, output, (short) 10);
+        MosaicGeneratorBash.generateMosaic(scale, size, size, sourceTilesDirectory, sourceImage, output, (short) 10);
     }
 
 //    private static void use100x100(String inputImage, String outputImage) throws IOException, InterruptedException {

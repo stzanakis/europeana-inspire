@@ -4,19 +4,30 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import eu.europeana.accessors.BoardAccessor;
 import eu.europeana.accessors.MeAccessor;
 import eu.europeana.common.Manager;
+import eu.europeana.common.Tools;
 import eu.europeana.exceptions.BadRequest;
 import eu.europeana.exceptions.DoesNotExistException;
+import eu.europeana.inspire.common.ImagesProcessor;
+import eu.europeana.inspire.common.MosaicGeneratorBash;
+import eu.europeana.model.PinsData;
+import eu.europeana.rest.configuration.ServletContext;
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.json.simple.JSONObject;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import java.io.IOException;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.io.*;
+import java.net.InetAddress;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -25,6 +36,7 @@ import java.util.List;
  */
 @Path("/")
 public class InspireServices {
+    private static final Logger logger = LogManager.getLogger();
 
     @GET
     @Produces("application/xml")
@@ -57,6 +69,103 @@ public class InspireServices {
         String prettyJson = gson.toJson(json);
 
         return prettyJson;
+    }
+
+    @POST
+    @Path("mosaic/{user}/{board}")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces("application/json")
+    public Response createMosaicFromBoard(@PathParam("board") String targetBoard,
+                                          @FormDataParam("file") InputStream uploadedInputStream,
+                                          @FormDataParam("fileName") String fileName) throws IOException, DoesNotExistException, URISyntaxException, BadRequest {
+
+//        String uploadedFileLocation = "/tmp/test/" + "something" + ".jpg";
+
+        File tempFile = Paths.get(ServletContext.manager.getRootStorageDirectory(), fileName).toFile();
+        // save temp file
+        writeToFile(uploadedInputStream, tempFile.toString());
+        String linkToMosaic = getImagesAndgenerateMyMosaic(4, 100, targetBoard, tempFile.toString());
+
+        InetAddress ip = InetAddress.getLocalHost();
+        String hostname = ip.getHostName();
+
+        tempFile.delete();
+        logger.info("Get your image here fs: " + linkToMosaic + "\n");
+        String parent = Tools.retrieveLastPathFromUrl(ServletContext.manager.getRootStorageDirectory());
+        String substring = linkToMosaic.substring(linkToMosaic.indexOf(parent));
+        String link = new URL(ServletContext.hardcodedUrl + "/" + substring).toString();
+        String result = "Get your image here link: " + link + "\n";
+        return Response.status(200).entity(result).build();
+    }
+
+    public static String getImagesAndgenerateMyMosaic(int scale, int size, String boardName, String sourceImage) throws BadRequest, DoesNotExistException, IOException, URISyntaxException {
+        String targetBoard = boardName;
+        String scaleSubdirectory = null;
+        if(scale > 10 ) {
+            logger.error("Available scales: <= 10");
+            return null;
+        }
+        switch (size)
+        {
+            case 100:
+                scaleSubdirectory = ImagesProcessor.directory100x100Name;
+                break;
+            case 60:
+                scaleSubdirectory = ImagesProcessor.directory60x60Name;
+                break;
+            case 40:
+                scaleSubdirectory = ImagesProcessor.directory40x40Name;
+                break;
+            default: {
+                logger.error("Available sizes : 100, 60, 40");
+                return null;
+            }
+        }
+
+        BoardAccessor boardAccessor = Manager.accessorsManager.getBoardAccessor();
+        //Download images from pinterest
+        //For all access we need to invoke the calls daily to retrieve
+        if(!targetBoard.equals("all-boards")) {
+            PinsData pinsFromBoard = boardAccessor.getPinsFromBoard(ServletContext.targetUser, targetBoard);
+            ImagesProcessor.storeAllPins(ServletContext.manager.getRootStorageDirectory(), pinsFromBoard);
+        }
+
+        //Generate mosaic
+        String outputFileName = scale + "-" + size + "x" + size + "-" + Tools.retrieveLastPathFromUrl(sourceImage);
+        String sourceTilesDirectory;
+        if(!targetBoard.equals("all-boards"))
+            sourceTilesDirectory = Paths.get(ServletContext.manager.getRootStorageDirectory(), scaleSubdirectory, boardName).toString();
+        else
+            sourceTilesDirectory = Paths.get(ServletContext.manager.getRootStorageDirectory(), scaleSubdirectory).toString();
+
+        java.nio.file.Path mosaicsDirectory = Paths.get(ServletContext.manager.getRootStorageDirectory(), ImagesProcessor.directoryMosaicsName);
+        String output = Paths.get(mosaicsDirectory.toString(), outputFileName).toString();
+
+        MosaicGeneratorBash.generateMosaic(scale, size, size, sourceTilesDirectory, sourceImage, output, (short) 10);
+
+        return output;
+    }
+
+        // save uploaded file to new location
+    private void writeToFile(InputStream uploadedInputStream,
+                             String uploadedFileLocation) {
+
+        try {
+            OutputStream out = new FileOutputStream(new File(
+                    uploadedFileLocation));
+            int read = 0;
+            byte[] bytes = new byte[1024];
+
+            out = new FileOutputStream(new File(uploadedFileLocation));
+            while ((read = uploadedInputStream.read(bytes)) != -1) {
+                out.write(bytes, 0, read);
+            }
+            out.flush();
+            out.close();
+        } catch (IOException e) {
+
+            e.printStackTrace();
+        }
     }
 
 }
