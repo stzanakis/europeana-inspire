@@ -43,7 +43,7 @@ public class InspireServices {
     @Produces("application/json")
     public String getAllBoardsFromUser(@PathParam("user") String targetUser) throws IOException, ConfigurationException, DoesNotExistException, URISyntaxException, BadRequest {
         MeAccessor meAccessor = Manager.accessorsManager.getMeAccessor();
-        List<String> allMyBoardsInternalName = meAccessor.getAllMyBoardsInternalName();
+        List<String> allMyBoardsInternalName = meAccessor.getAllMyBoardsInternalName(targetUser);
 
         JSONObject obj = new JSONObject();
         obj.put("board-count", new Integer(allMyBoardsInternalName.size()));

@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Needs metapixel bash command installed on the host system.
@@ -80,16 +81,18 @@ public class Main {
 //        getImagesAndgenerateMyMosaic(4, 100, "heroes", "/tmp/test/input2.jpg");
 //        generateMyMosaic(4, 60, "heroes", "/tmp/test/input2.jpg");
 
-//        List<String> allMyBoardsInternalName = meAccessor.getAllMyBoardsInternalName();
+
+        List<String> allMyBoardsInternalName = meAccessor.getAllMyBoardsInternalName(targetUser);
 //        PinsData pinsFromBoard = boardAccessor.getAllPinsFromBoard(targetUser, allMyBoardsInternalName.get(1));
 //        ImagesProcessor.storeAllPins(manager.getRootStorageDirectory(), pinsFromBoard);
 
-//        for (String boardName :
-//                allMyBoardsInternalName) {
-//            PinsData pinsFromBoard = boardAccessor.getAllPinsFromBoard(targetUser, boardName);
-//            ImagesProcessor.storeAllPins(manager.getRootStorageDirectory(), pinsFromBoard);
-//
-//        }
+        for (String boardName :
+                allMyBoardsInternalName) {
+            logger.info(boardName);
+            PinsData pinsFromBoard = boardAccessor.getAllPinsFromBoard(targetUser, boardName);
+            ImagesProcessor.storeAllPins(manager.getRootStorageDirectory(), pinsFromBoard);
+
+        }
         //Generate until you fail...
 //        String inputImage = "/tmp/test/input2.jpg";
 //        String outputImage = "/tmp/test/output.png";
