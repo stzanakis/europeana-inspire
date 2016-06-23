@@ -37,6 +37,8 @@ public class Manager {
         Files.createDirectories(Paths.get(rootStorageDirectory, ImagesProcessor.directory100x100Name));
         Files.createDirectories(Paths.get(rootStorageDirectory, ImagesProcessor.directory60x60Name));
         Files.createDirectories(Paths.get(rootStorageDirectory, ImagesProcessor.directory40x40Name));
+        Files.createDirectories(Paths.get(rootStorageDirectory, ImagesProcessor.directory30x30Name));
+        Files.createDirectories(Paths.get(rootStorageDirectory, ImagesProcessor.directory20x20Name));
         Files.createDirectories(Paths.get(rootStorageDirectory, ImagesProcessor.directoryMosaicsName));
     }
 

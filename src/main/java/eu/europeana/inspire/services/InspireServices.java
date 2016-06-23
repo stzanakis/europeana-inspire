@@ -108,8 +108,14 @@ public class InspireServices {
             case 40:
                 scaleSubdirectory = ImagesProcessor.directory40x40Name;
                 break;
+            case 30:
+                scaleSubdirectory = ImagesProcessor.directory30x30Name;
+                break;
+            case 20:
+                scaleSubdirectory = ImagesProcessor.directory20x20Name;
+                break;
             default: {
-                logger.error("Available sizes : 100, 60, 40");
+                logger.error("Available sizes : 100, 60, 40, 30, 20");
                 return null;
             }
         }

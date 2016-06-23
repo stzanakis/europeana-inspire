@@ -26,6 +26,8 @@ public class ImagesProcessor {
     public static final String directory100x100Name = "100x100-size";
     public static final String directory60x60Name = "60x60-size";
     public static final String directory40x40Name = "40x40-size";
+    public static final String directory30x30Name = "30x30-size";
+    public static final String directory20x20Name = "20x20-size";
     public static final String directoryMosaicsName = "mosaics";
 
     public static void storeAllPins(String rootStorageDirectory, PinsData pinsFromBoard) throws URISyntaxException, IOException {
@@ -71,10 +73,14 @@ public class ImagesProcessor {
 //        Files.createDirectories(path60x60);
         Path path40x40 = Paths.get(rootStorageDirectory, directory40x40Name, boardName);
 //        Files.createDirectories(path40x40);
+        Path path30x30 = Paths.get(rootStorageDirectory, directory30x30Name, boardName);
+        Path path20x20 = Paths.get(rootStorageDirectory, directory20x20Name, boardName);
 
         MosaicGeneratorBash.prepareImages(100, 100, sourceDirectory, path100x100.toString());
         MosaicGeneratorBash.prepareImages(60, 60, sourceDirectory, path60x60.toString());
         MosaicGeneratorBash.prepareImages(40, 40, sourceDirectory, path40x40.toString());
+        MosaicGeneratorBash.prepareImages(30, 30, sourceDirectory, path30x30.toString());
+        MosaicGeneratorBash.prepareImages(20, 20, sourceDirectory, path20x20.toString());
     }
 
     private static void resizeImage(int width, int height, String srcImage, String destImage, String destinationImageType) throws IOException {
