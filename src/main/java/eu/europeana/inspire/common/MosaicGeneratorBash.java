@@ -25,7 +25,7 @@ public class MosaicGeneratorBash {
         StringBuilder command = new StringBuilder("metapixel --metapixel --scale=" + scale + " --distance=0 --width=" + width + " --height=" + height);
         for (String library :
                 imageLibrary) {
-            command.append(" --library=" + imageLibrary);
+            command.append(" --library=" + library);
         }
 
         command.append(" " + inputImage + " " + outputImage);
@@ -37,7 +37,7 @@ public class MosaicGeneratorBash {
         StringBuilder command = new StringBuilder("metapixel --metapixel --cheat=" + cheatValue + " --scale=" + scale + " --distance=0 --width=" + width + " --height=" + height);
         for (String library :
                 imageLibrary) {
-            command.append(" --library=" + imageLibrary);
+            command.append(" --library=" + library);
         }
 
         command.append(" " + inputImage + " " + outputImage);

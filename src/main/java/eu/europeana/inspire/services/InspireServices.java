@@ -29,7 +29,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -130,15 +129,13 @@ public class InspireServices {
             sourceTilesDirectories.add(Paths.get(ServletContext.manager.getRootStorageDirectory(), scaleSubdirectory, boardName).toString());
         else {
             //Get list of all directories with relevant size
-            File file = new File(Paths.get(ServletContext.manager.getRootStorageDirectory(), scaleSubdirectory).toString());
-            String[] directories = file.list(new FilenameFilter() {
-                @Override
-                public boolean accept(File current, String name) {
-                    return new File(current, name).isDirectory();
+            String directory = Paths.get(ServletContext.manager.getRootStorageDirectory(), scaleSubdirectory).toString();
+            File[] files = new File(directory).listFiles();
+            for(File file : files){
+                if(file.isDirectory()){
+                    sourceTilesDirectories.add(file.getAbsolutePath());
                 }
-            });
-
-            sourceTilesDirectories.addAll(Arrays.asList(directories));
+            }
         }
 
         java.nio.file.Path mosaicsDirectory = Paths.get(ServletContext.manager.getRootStorageDirectory(), ImagesProcessor.directoryMosaicsName);
