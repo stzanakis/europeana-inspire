@@ -96,7 +96,9 @@ public class InspireServices {
         String parent = Tools.retrieveLastPathFromUrl(ServletContext.manager.getRootStorageDirectory());
         String substring = linkToMosaic.substring(linkToMosaic.indexOf(parent));
         String link = new URL(ServletContext.hardcodedUrl + "/" + substring).toString();
-        String result = "Get your image here link: " + link + "\n";
+        String result = "{\n" +
+                "  \"result\": \""+ link +"\"\n" +
+                "}\n";
         return Response.status(200).entity(result).build();
     }
 
