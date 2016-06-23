@@ -6,7 +6,9 @@ import eu.europeana.common.AccessorsManager;
 import eu.europeana.common.Manager;
 import eu.europeana.exceptions.BadRequest;
 import eu.europeana.exceptions.DoesNotExistException;
+import eu.europeana.inspire.common.ImagesProcessor;
 import eu.europeana.inspire.common.MosaicGenerator;
+import eu.europeana.model.PinsData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,6 +17,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 /**
+ * Needs metapixel bash command installed on the host system.
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2016-06-21
  */
@@ -46,7 +49,9 @@ public class Main {
 
         //PLAYGROUND START
 
-//        TestTerminal.executeCommands();
+//        MosaicGeneratorBash.prepareImages(100, 100, "/tmp/europeana-inspire/original-size/heroes", "/tmp/test/ml");
+
+//        MosaicGeneratorBash.generateMosaic(4, 100, 100,  "/tmp/test/ml", "/tmp/test/input2.jpg", "/tmp/test/output.png", (short) 10);
 
 //        ProcessBuilder pb = new ProcessBuilder("ls");
 //        pb.inheritIO();
@@ -60,8 +65,8 @@ public class Main {
 
 
         //Get and store all pins from a specific board Start
-//        PinsData pinsFromBoard = boardAccessor.getPinsFromBoard(targetUser, targetBoard);
-//        ImagesProcessor.storeAllPins(manager.getRootStorageDirectory(), pinsFromBoard);
+        PinsData pinsFromBoard = boardAccessor.getPinsFromBoard(targetUser, targetBoard);
+        ImagesProcessor.storeAllPins(manager.getRootStorageDirectory(), pinsFromBoard);
 
 //        List<String> allMyBoardsInternalName = meAccessor.getAllMyBoardsInternalName();
 //        PinsData pinsFromBoard = boardAccessor.getAllPinsFromBoard(targetUser, allMyBoardsInternalName.get(1));
@@ -74,8 +79,8 @@ public class Main {
 //
 //        }
         //Generate until you fail...
-        String inputImage = "/tmp/test/input2.jpg";
-        String outputImage = "/tmp/test/output.png";
+//        String inputImage = "/tmp/test/input2.jpg";
+//        String outputImage = "/tmp/test/output.png";
 
 //        use100x100(inputImage, outputImage);
 //        use60x60(inputImage, outputImage);
