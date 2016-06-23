@@ -59,7 +59,7 @@ public class InspireServices {
         List<String> allMyBoardsInternalName = meAccessor.getAllMyBoardsInternalName();
 
         JSONObject obj = new JSONObject();
-        obj.put("table-count", new Integer(allMyBoardsInternalName.size()));
+        obj.put("board-count", new Integer(allMyBoardsInternalName.size()));
         obj.put("names", allMyBoardsInternalName);
 
         JsonParser parser = new JsonParser();
@@ -76,15 +76,17 @@ public class InspireServices {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
     public Response createMosaicFromBoard(@PathParam("board") String targetBoard,
+                                          @QueryParam("scale") int scale,
+                                          @QueryParam("size") int size,
                                           @FormDataParam("file") InputStream uploadedInputStream,
                                           @FormDataParam("fileName") String fileName) throws IOException, DoesNotExistException, URISyntaxException, BadRequest {
-
-//        String uploadedFileLocation = "/tmp/test/" + "something" + ".jpg";
 
         File tempFile = Paths.get(ServletContext.manager.getRootStorageDirectory(), fileName).toFile();
         // save temp file
         writeToFile(uploadedInputStream, tempFile.toString());
-        String linkToMosaic = getImagesAndgenerateMyMosaic(4, 100, targetBoard, tempFile.toString());
+        String linkToMosaic = getImagesAndgenerateMyMosaic(scale, size, targetBoard, tempFile.toString());
+        if(linkToMosaic == null)
+            return Response.status(400).entity("Bad request").build();
 
         InetAddress ip = InetAddress.getLocalHost();
         String hostname = ip.getHostName();
