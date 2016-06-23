@@ -12,6 +12,7 @@ import eu.europeana.exceptions.BadRequest;
 import eu.europeana.exceptions.DoesNotExistException;
 import eu.europeana.inspire.common.ImagesProcessor;
 import eu.europeana.inspire.common.MosaicGeneratorBash;
+import eu.europeana.inspire.model.Result;
 import eu.europeana.model.PinsData;
 import eu.europeana.rest.configuration.ServletContext;
 import org.apache.commons.configuration.ConfigurationException;
@@ -72,7 +73,8 @@ public class InspireServices {
         File tempFile = Paths.get(ServletContext.manager.getRootStorageDirectory(), fileName).toFile();
         // save temp file
         writeToFile(uploadedInputStream, tempFile.toString());
-        String linkToMosaic = getImagesAndgenerateMyMosaic(updates, scale, size, targetBoard, tempFile.toString());
+        Result result = getImagesAndgenerateMyMosaic(updates, scale, size, targetBoard, tempFile.toString());
+        String linkToMosaic = result.getLink();
         if(linkToMosaic == null)
             return Response.status(400).entity("Bad request").build();
 
@@ -84,13 +86,12 @@ public class InspireServices {
         String parent = Tools.retrieveLastPathFromUrl(ServletContext.manager.getRootStorageDirectory());
         String substring = linkToMosaic.substring(linkToMosaic.indexOf(parent));
         String link = new URL(ServletContext.hardcodedUrl + "/" + substring).toString();
-        String result = "{\n" +
-                "  \"result\": \""+ link +"\"\n" +
-                "}\n";
+        result.setLink(link); //Update link to actual http link
+
         return Response.status(200).entity(result).build();
     }
 
-    public static String getImagesAndgenerateMyMosaic(boolean withUpdates, int scale, int size, String boardName, String sourceImage) throws BadRequest, DoesNotExistException, IOException, URISyntaxException {
+    public static Result getImagesAndgenerateMyMosaic(boolean withUpdates, int scale, int size, String boardName, String sourceImage) throws BadRequest, DoesNotExistException, IOException, URISyntaxException {
         String targetBoard = boardName;
         String scaleSubdirectory = null;
         if(scale > 10 ) {
@@ -147,9 +148,10 @@ public class InspireServices {
         java.nio.file.Path mosaicsDirectory = Paths.get(ServletContext.manager.getRootStorageDirectory(), ImagesProcessor.directoryMosaicsName);
         String output = Paths.get(mosaicsDirectory.toString(), outputFileName).toString();
 
-        MosaicGeneratorBash.generateMosaic(scale, size, size, sourceTilesDirectories, sourceImage, output, (short) 10);
+        int uniqueTileCount = MosaicGeneratorBash.generateMosaic(scale, size, size, sourceTilesDirectories, sourceImage, output, (short) 10);
+        Result result = new Result(uniqueTileCount, output);
 
-        return output;
+        return result;
     }
 
         // save uploaded file to new location

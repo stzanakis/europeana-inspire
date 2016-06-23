@@ -8,6 +8,7 @@ import eu.europeana.exceptions.BadRequest;
 import eu.europeana.exceptions.DoesNotExistException;
 import eu.europeana.inspire.common.ImagesProcessor;
 import eu.europeana.inspire.common.MosaicGeneratorBash;
+import eu.europeana.inspire.model.Result;
 import eu.europeana.model.PinsData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -86,10 +87,12 @@ public class Main {
 //        PinsData pinsFromBoard = boardAccessor.getAllPinsFromBoard(targetUser, allMyBoardsInternalName.get(1));
 //        ImagesProcessor.storeAllPins(manager.getRootStorageDirectory(), pinsFromBoard);
 
-        ArrayList<String> libraries = new ArrayList<>();
-        libraries.add("/data/datastore/europeana-inspire/100x100-size/knights");
-        String output = "/data/datastore/europeana-inspire/mosaics/output.png";
-        int totalUniqueImages = MosaicGeneratorBash.generateMosaic(4, 100, 100, libraries, "/tmp/test/input.jpg", output, (short) 10);
+//        ArrayList<String> libraries = new ArrayList<>();
+//        libraries.add("/data/datastore/europeana-inspire/100x100-size/knights");
+//        String output = "/data/datastore/europeana-inspire/mosaics/output.png";
+//        int totalUniqueImages = MosaicGeneratorBash.generateMosaic(4, 100, 100, libraries, "/tmp/test/input.jpg", output, (short) 10);
+
+//        System.out.println(new Result(10, "ok"));
 
 //        for (String boardName :
 //                allMyBoardsInternalName) {
