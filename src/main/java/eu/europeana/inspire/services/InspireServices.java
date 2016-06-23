@@ -91,6 +91,44 @@ public class InspireServices {
         return Response.status(200).entity(result).build();
     }
 
+    @GET
+    @Path("mosaic/{director}")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces("application/json")
+    public Response getDirector(@PathParam("director") String director) throws URISyntaxException, IOException, BadRequest, DoesNotExistException {
+        String sourceImage = null;
+        switch (director)
+        {
+            case "david":
+                sourceImage = "/data/datastore/europeana-inspire/directors/David.jpg";
+                break;
+            case "albert":
+                sourceImage = "/data/datastore/europeana-inspire/directors/Albert.jpg";
+                break;
+            case "harry":
+                sourceImage = "/data/datastore/europeana-inspire/directors/Harry.jpg";
+                break;
+            case "jill":
+                sourceImage = "/data/datastore/europeana-inspire/directors/Jill.jpg";
+                break;
+        }
+        Result result = getImagesAndgenerateMyMosaic(false, 20, 100, "all-boards", sourceImage);
+        String linkToMosaic = result.getLink();
+        if(linkToMosaic == null)
+            return Response.status(400).entity("Bad request").build();
+
+        InetAddress ip = InetAddress.getLocalHost();
+        String hostname = ip.getHostName();
+
+        logger.info("Get your image here fs: " + linkToMosaic + "\n");
+        String parent = Tools.retrieveLastPathFromUrl(ServletContext.manager.getRootStorageDirectory());
+        String substring = linkToMosaic.substring(linkToMosaic.indexOf(parent));
+        String link = new URL(ServletContext.hardcodedUrl + "/" + substring).toString();
+        result.setLink(link); //Update link to actual http link
+
+        return Response.status(200).entity(result).build();
+    }
+
     public static Result getImagesAndgenerateMyMosaic(boolean withUpdates, int scale, int size, String boardName, String sourceImage) throws BadRequest, DoesNotExistException, IOException, URISyntaxException {
         String targetBoard = boardName;
         String scaleSubdirectory = null;
