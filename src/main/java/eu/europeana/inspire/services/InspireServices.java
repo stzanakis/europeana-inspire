@@ -94,7 +94,7 @@ public class InspireServices {
     public static Result getImagesAndgenerateMyMosaic(boolean withUpdates, int scale, int size, String boardName, String sourceImage) throws BadRequest, DoesNotExistException, IOException, URISyntaxException {
         String targetBoard = boardName;
         String scaleSubdirectory = null;
-        if(scale > 10 ) {
+        if(scale > 20 ) {
             logger.error("Available scales: <= 10");
             return null;
         }
