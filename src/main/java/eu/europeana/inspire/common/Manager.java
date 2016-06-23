@@ -23,11 +23,14 @@ public class Manager {
     private final static String storageDirectoryKey = "storageDirectory";
     private static String defaultPropertiesPath;
     private String rootStorageDirectory;
+    public static AccessorsManager accessorsManager;
 
-    public Manager(String defaultPropertiesPath) throws IOException, ConfigurationException {
+    public Manager(String defaultPropertiesPath, String pinterestConfDirectory) throws IOException, ConfigurationException {
         this.defaultPropertiesPath = defaultPropertiesPath;
         PropertiesConfiguration propertiesConfigurationInspire = Configuration.loadConfiguration(Manager.getDefaultPropertiesPath(), Manager.getConfigurationFileName());
         rootStorageDirectory = propertiesConfigurationInspire.getProperty(Manager.getStorageDirectoryKey()).toString();
+
+        Manager.accessorsManager = new AccessorsManager(pinterestConfDirectory);
 
         //Create required directories
         Files.createDirectories(Paths.get(rootStorageDirectory, ImagesProcessor.directoryOriginalSizeName));

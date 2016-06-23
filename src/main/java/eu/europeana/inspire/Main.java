@@ -2,7 +2,6 @@ package eu.europeana.inspire;
 
 import eu.europeana.accessors.BoardAccessor;
 import eu.europeana.accessors.MeAccessor;
-import eu.europeana.common.AccessorsManager;
 import eu.europeana.common.Manager;
 import eu.europeana.common.Tools;
 import eu.europeana.exceptions.BadRequest;
@@ -28,7 +27,6 @@ import java.nio.file.Paths;
  */
 public class Main {
     private static final Logger logger = LogManager.getLogger();
-    private static AccessorsManager accessorsManager;
     private static Manager manager;
     private static MeAccessor meAccessor;
     private static BoardAccessor boardAccessor;
@@ -41,17 +39,13 @@ public class Main {
         String pinterestConfDirectory = "/data/credentials/pinterest-client";
         String europeanaInspireConfDirectory = "/data/credentials/europeana-inspire";
 
-        //Load Pinterest Configuration Start
-        accessorsManager = new AccessorsManager(pinterestConfDirectory);
-        //Load Pinterest Configuration End
-
         //Load Europeana Inspire Start
-        manager = new Manager(europeanaInspireConfDirectory);
+        Manager manager = new Manager(europeanaInspireConfDirectory, pinterestConfDirectory);
         //Load Europeana Inspire End
 
-        accessorsManager.initializeAllAccessors();
-        meAccessor = accessorsManager.getMeAccessor();
-        boardAccessor = accessorsManager.getBoardAccessor();
+        Manager.accessorsManager.initializeAllAccessors();
+        meAccessor = Manager.accessorsManager.getMeAccessor();
+        boardAccessor = Manager.accessorsManager.getBoardAccessor();
         //INITIALIZE END
 
 
@@ -80,7 +74,7 @@ public class Main {
 //        MosaicGeneratorBash.generateMosaic(6, 60, 60, "/tmp/europeana-inspire/60x60-size/heroes", "/tmp/test/input2.jpg", "/tmp/test/output60.png", (short) 10);
 //        MosaicGeneratorBash.generateMosaic(6, 40, 40, "/tmp/europeana-inspire/60x60-size/heroes", "/tmp/test/input2.jpg", "/tmp/test/output40.png", (short) 10);
 
-        getImagesAndgenerateMyMosaic(4, 60, "heroes", "/tmp/test/input2.jpg");
+        getImagesAndgenerateMyMosaic(4, 100, "heroes", "/tmp/test/input2.jpg");
 //        generateMyMosaic(4, 60, "heroes", "/tmp/test/input2.jpg");
 
 //        List<String> allMyBoardsInternalName = meAccessor.getAllMyBoardsInternalName();
@@ -124,7 +118,7 @@ public class Main {
 
 
         //CLOSE START
-        accessorsManager.closeAllAccessors();
+        Manager.accessorsManager.closeAllAccessors();
         //CLOSE END
 
         logger.info("Ended in Main");
@@ -155,12 +149,20 @@ public class Main {
         }
 
         //Download images from pinterest
-        PinsData pinsFromBoard = boardAccessor.getPinsFromBoard(targetUser, targetBoard);
-        ImagesProcessor.storeAllPins(manager.getRootStorageDirectory(), pinsFromBoard);
+        //For all access we need to invoke the calls daily to retrieve
+        if(!targetBoard.equals("all-boards")) {
+            PinsData pinsFromBoard = boardAccessor.getPinsFromBoard(targetUser, targetBoard);
+            ImagesProcessor.storeAllPins(manager.getRootStorageDirectory(), pinsFromBoard);
+        }
 
         //Generate mosaic
-        String outputFileName = size + "x" + size + "-" + Tools.retrieveLastPathFromUrl(sourceImage);
-        String sourceTilesDirectory = Paths.get(manager.getRootStorageDirectory(), scaleSubdirectory, boardName).toString();
+        String outputFileName = scale + "-" + size + "x" + size + "-" + Tools.retrieveLastPathFromUrl(sourceImage);
+        String sourceTilesDirectory;
+        if(!targetBoard.equals("all-boards"))
+            sourceTilesDirectory = Paths.get(manager.getRootStorageDirectory(), scaleSubdirectory, boardName).toString();
+        else
+            sourceTilesDirectory = Paths.get(manager.getRootStorageDirectory(), scaleSubdirectory).toString();
+
         Path mosaicsDirectory = Paths.get(manager.getRootStorageDirectory(), ImagesProcessor.directoryMosaicsName);
         String output = Paths.get(mosaicsDirectory.toString(), outputFileName).toString();
 
