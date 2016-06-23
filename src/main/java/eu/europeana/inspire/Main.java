@@ -13,10 +13,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.naming.ConfigurationException;
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Needs metapixel bash command installed on the host system.
@@ -73,7 +77,7 @@ public class Main {
 //        MosaicGeneratorBash.generateMosaic(6, 60, 60, "/tmp/europeana-inspire/60x60-size/heroes", "/tmp/test/input2.jpg", "/tmp/test/output60.png", (short) 10);
 //        MosaicGeneratorBash.generateMosaic(6, 40, 40, "/tmp/europeana-inspire/60x60-size/heroes", "/tmp/test/input2.jpg", "/tmp/test/output40.png", (short) 10);
 
-        getImagesAndgenerateMyMosaic(4, 100, "heroes", "/tmp/test/input2.jpg");
+//        getImagesAndgenerateMyMosaic(4, 100, "heroes", "/tmp/test/input2.jpg");
 //        generateMyMosaic(4, 60, "heroes", "/tmp/test/input2.jpg");
 
 //        List<String> allMyBoardsInternalName = meAccessor.getAllMyBoardsInternalName();
@@ -156,16 +160,26 @@ public class Main {
 
         //Generate mosaic
         String outputFileName = scale + "-" + size + "x" + size + "-" + Tools.retrieveLastPathFromUrl(sourceImage);
-        String sourceTilesDirectory;
+        ArrayList<String> sourceTilesDirectories = new ArrayList<>();
         if(!targetBoard.equals("all-boards"))
-            sourceTilesDirectory = Paths.get(manager.getRootStorageDirectory(), scaleSubdirectory, boardName).toString();
-        else
-            sourceTilesDirectory = Paths.get(manager.getRootStorageDirectory(), scaleSubdirectory).toString();
+            sourceTilesDirectories.add(Paths.get(manager.getRootStorageDirectory(), scaleSubdirectory, boardName).toString());
+        else {
+            //Get list of all directories with relevant size
+            File file = new File(Paths.get(manager.getRootStorageDirectory(), scaleSubdirectory).toString());
+            String[] directories = file.list(new FilenameFilter() {
+                @Override
+                public boolean accept(File current, String name) {
+                    return new File(current, name).isDirectory();
+                }
+            });
+
+            sourceTilesDirectories.addAll(Arrays.asList(directories));
+        }
 
         Path mosaicsDirectory = Paths.get(manager.getRootStorageDirectory(), ImagesProcessor.directoryMosaicsName);
         String output = Paths.get(mosaicsDirectory.toString(), outputFileName).toString();
 
-        MosaicGeneratorBash.generateMosaic(scale, size, size, sourceTilesDirectory, sourceImage, output, (short) 10);
+        MosaicGeneratorBash.generateMosaic(scale, size, size, sourceTilesDirectories, sourceImage, output, (short) 10);
 
         return output;
     }
@@ -196,16 +210,26 @@ public class Main {
 
         //Generate mosaic
         String outputFileName = scale + "-" + size + "x" + size + "-" + Tools.retrieveLastPathFromUrl(sourceImage);
-        String sourceTilesDirectory;
+        ArrayList<String> sourceTilesDirectories = new ArrayList<>();
         if(!targetBoard.equals("all-boards"))
-            sourceTilesDirectory = Paths.get(manager.getRootStorageDirectory(), scaleSubdirectory, boardName).toString();
-        else
-            sourceTilesDirectory = Paths.get(manager.getRootStorageDirectory(), scaleSubdirectory).toString();
+            sourceTilesDirectories.add(Paths.get(manager.getRootStorageDirectory(), scaleSubdirectory, boardName).toString());
+        else {
+            //Get list of all directories with relevant size
+            File file = new File(Paths.get(manager.getRootStorageDirectory(), scaleSubdirectory).toString());
+            String[] directories = file.list(new FilenameFilter() {
+                @Override
+                public boolean accept(File current, String name) {
+                    return new File(current, name).isDirectory();
+                }
+            });
+
+            sourceTilesDirectories.addAll(Arrays.asList(directories));
+        }
 
         Path mosaicsDirectory = Paths.get(manager.getRootStorageDirectory(), ImagesProcessor.directoryMosaicsName);
         String output = Paths.get(mosaicsDirectory.toString(), outputFileName).toString();
 
-        MosaicGeneratorBash.generateMosaic(scale, size, size, sourceTilesDirectory, sourceImage, output, (short) 10);
+        MosaicGeneratorBash.generateMosaic(scale, size, size, sourceTilesDirectories, sourceImage, output, (short) 10);
     }
 
 //    private static void use100x100(String inputImage, String outputImage) throws IOException, InterruptedException {

@@ -28,6 +28,8 @@ import java.net.InetAddress;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -64,13 +66,14 @@ public class InspireServices {
     public Response createMosaicFromBoard(@PathParam("board") String targetBoard,
                                           @QueryParam("scale") int scale,
                                           @QueryParam("size") int size,
+                                          @DefaultValue("true") @QueryParam("updates") boolean updates,
                                           @FormDataParam("file") InputStream uploadedInputStream,
                                           @FormDataParam("fileName") String fileName) throws IOException, DoesNotExistException, URISyntaxException, BadRequest {
 
         File tempFile = Paths.get(ServletContext.manager.getRootStorageDirectory(), fileName).toFile();
         // save temp file
         writeToFile(uploadedInputStream, tempFile.toString());
-        String linkToMosaic = getImagesAndgenerateMyMosaic(scale, size, targetBoard, tempFile.toString());
+        String linkToMosaic = getImagesAndgenerateMyMosaic(updates, scale, size, targetBoard, tempFile.toString());
         if(linkToMosaic == null)
             return Response.status(400).entity("Bad request").build();
 
@@ -88,7 +91,7 @@ public class InspireServices {
         return Response.status(200).entity(result).build();
     }
 
-    public static String getImagesAndgenerateMyMosaic(int scale, int size, String boardName, String sourceImage) throws BadRequest, DoesNotExistException, IOException, URISyntaxException {
+    public static String getImagesAndgenerateMyMosaic(boolean withUpdates, int scale, int size, String boardName, String sourceImage) throws BadRequest, DoesNotExistException, IOException, URISyntaxException {
         String targetBoard = boardName;
         String scaleSubdirectory = null;
         if(scale > 10 ) {
@@ -115,23 +118,33 @@ public class InspireServices {
         BoardAccessor boardAccessor = Manager.accessorsManager.getBoardAccessor();
         //Download images from pinterest
         //For all access we need to invoke the calls daily to retrieve
-        if(!targetBoard.equals("all-boards")) {
+        if(!targetBoard.equals("all-boards") && withUpdates == true) {
             PinsData pinsFromBoard = boardAccessor.getPinsFromBoard(ServletContext.targetUser, targetBoard);
             ImagesProcessor.storeAllPins(ServletContext.manager.getRootStorageDirectory(), pinsFromBoard);
         }
 
         //Generate mosaic
         String outputFileName = scale + "-" + size + "x" + size + "-" + Tools.retrieveLastPathFromUrl(sourceImage);
-        String sourceTilesDirectory;
+        ArrayList<String> sourceTilesDirectories = new ArrayList<>();
         if(!targetBoard.equals("all-boards"))
-            sourceTilesDirectory = Paths.get(ServletContext.manager.getRootStorageDirectory(), scaleSubdirectory, boardName).toString();
-        else
-            sourceTilesDirectory = Paths.get(ServletContext.manager.getRootStorageDirectory(), scaleSubdirectory).toString();
+            sourceTilesDirectories.add(Paths.get(ServletContext.manager.getRootStorageDirectory(), scaleSubdirectory, boardName).toString());
+        else {
+            //Get list of all directories with relevant size
+            File file = new File(Paths.get(ServletContext.manager.getRootStorageDirectory(), scaleSubdirectory).toString());
+            String[] directories = file.list(new FilenameFilter() {
+                @Override
+                public boolean accept(File current, String name) {
+                    return new File(current, name).isDirectory();
+                }
+            });
+
+            sourceTilesDirectories.addAll(Arrays.asList(directories));
+        }
 
         java.nio.file.Path mosaicsDirectory = Paths.get(ServletContext.manager.getRootStorageDirectory(), ImagesProcessor.directoryMosaicsName);
         String output = Paths.get(mosaicsDirectory.toString(), outputFileName).toString();
 
-        MosaicGeneratorBash.generateMosaic(scale, size, size, sourceTilesDirectory, sourceImage, output, (short) 10);
+        MosaicGeneratorBash.generateMosaic(scale, size, size, sourceTilesDirectories, sourceImage, output, (short) 10);
 
         return output;
     }

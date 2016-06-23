@@ -21,18 +21,28 @@ import java.util.List;
 public class MosaicGeneratorBash {
     private static final Logger logger = LogManager.getLogger();
 
-    public static void generateMosaic(int scale, int width, int height, String imageLibrary, String inputImage, String outputImage){
-        String command = "metapixel --metapixel --scale=" + scale + " --distance=0 --width=" + width + " --height=" + height +
-                " --library=" + imageLibrary + " " + inputImage + " " + outputImage;
+    public static void generateMosaic(int scale, int width, int height, ArrayList<String> imageLibrary, String inputImage, String outputImage){
+        StringBuilder command = new StringBuilder("metapixel --metapixel --scale=" + scale + " --distance=0 --width=" + width + " --height=" + height);
+        for (String library :
+                imageLibrary) {
+            command.append(" --library=" + imageLibrary);
+        }
+
+        command.append(" " + inputImage + " " + outputImage);
         logger.info("Starting command: " + command);
-        runBashCommand(command);
+        runBashCommand(command.toString());
     }
 
-    public static void generateMosaic(int scale, int width, int height, String imageLibrary, String inputImage, String outputImage, short cheatValue){
-        String command = "metapixel --metapixel --cheat=" + cheatValue + " --scale=" + scale + " --distance=0 --width=" + width + " --height=" + height +
-                " --library=" + imageLibrary + " " + inputImage + " " + outputImage;
+    public static void generateMosaic(int scale, int width, int height, ArrayList<String> imageLibrary, String inputImage, String outputImage, short cheatValue){
+        StringBuilder command = new StringBuilder("metapixel --metapixel --cheat=" + cheatValue + " --scale=" + scale + " --distance=0 --width=" + width + " --height=" + height);
+        for (String library :
+                imageLibrary) {
+            command.append(" --library=" + imageLibrary);
+        }
+
+        command.append(" " + inputImage + " " + outputImage);
         logger.info("Starting command: " + command);
-        runBashCommand(command);
+        runBashCommand(command.toString());
     }
 
     public static void prepareImages(int width, int height, String sourceImagesDirectory, String convertedImagesDirectory) throws IOException {
