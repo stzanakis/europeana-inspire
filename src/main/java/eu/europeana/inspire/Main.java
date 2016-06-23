@@ -4,10 +4,11 @@ import eu.europeana.accessors.BoardAccessor;
 import eu.europeana.accessors.MeAccessor;
 import eu.europeana.common.AccessorsManager;
 import eu.europeana.common.Manager;
+import eu.europeana.common.Tools;
 import eu.europeana.exceptions.BadRequest;
 import eu.europeana.exceptions.DoesNotExistException;
 import eu.europeana.inspire.common.ImagesProcessor;
-import eu.europeana.inspire.common.MosaicGenerator;
+import eu.europeana.inspire.common.MosaicGeneratorBash;
 import eu.europeana.model.PinsData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,14 +16,23 @@ import org.apache.logging.log4j.Logger;
 import javax.naming.ConfigurationException;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Needs metapixel bash command installed on the host system.
+ *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2016-06-21
  */
 public class Main {
     private static final Logger logger = LogManager.getLogger();
+    private static AccessorsManager accessorsManager;
+    private static Manager manager;
+    private static MeAccessor meAccessor;
+    private static BoardAccessor boardAccessor;
+    private static String targetUser = "europeana";
 
     public static void main(String[] args) throws IOException, ConfigurationException, org.apache.commons.configuration.ConfigurationException, BadRequest, DoesNotExistException, URISyntaxException, InterruptedException {
         logger.info("Started in Main");
@@ -30,20 +40,18 @@ public class Main {
         //INITIALIZE START
         String pinterestConfDirectory = "/data/credentials/pinterest-client";
         String europeanaInspireConfDirectory = "/data/credentials/europeana-inspire";
-        String targetUser = "europeana";
-        String targetBoard = "Heroes";
 
         //Load Pinterest Configuration Start
-        AccessorsManager am = new AccessorsManager(pinterestConfDirectory);
+        accessorsManager = new AccessorsManager(pinterestConfDirectory);
         //Load Pinterest Configuration End
 
         //Load Europeana Inspire Start
-        Manager manager = new Manager(europeanaInspireConfDirectory);
+        manager = new Manager(europeanaInspireConfDirectory);
         //Load Europeana Inspire End
 
-        am.initializeAllAccessors();
-        MeAccessor meAccessor = am.getMeAccessor();
-        BoardAccessor boardAccessor = am.getBoardAccessor();
+        accessorsManager.initializeAllAccessors();
+        meAccessor = accessorsManager.getMeAccessor();
+        boardAccessor = accessorsManager.getBoardAccessor();
         //INITIALIZE END
 
 
@@ -65,8 +73,15 @@ public class Main {
 
 
         //Get and store all pins from a specific board Start
-        PinsData pinsFromBoard = boardAccessor.getPinsFromBoard(targetUser, targetBoard);
-        ImagesProcessor.storeAllPins(manager.getRootStorageDirectory(), pinsFromBoard);
+//        PinsData pinsFromBoard = boardAccessor.getPinsFromBoard(targetUser, targetBoard);
+//        ImagesProcessor.storeAllPins(manager.getRootStorageDirectory(), pinsFromBoard);
+
+//        MosaicGeneratorBash.generateMosaic(6, 100, 100, "/tmp/europeana-inspire/100x100-size/heroes", "/tmp/test/input2.jpg", "/tmp/test/output100.png", (short) 10);
+//        MosaicGeneratorBash.generateMosaic(6, 60, 60, "/tmp/europeana-inspire/60x60-size/heroes", "/tmp/test/input2.jpg", "/tmp/test/output60.png", (short) 10);
+//        MosaicGeneratorBash.generateMosaic(6, 40, 40, "/tmp/europeana-inspire/60x60-size/heroes", "/tmp/test/input2.jpg", "/tmp/test/output40.png", (short) 10);
+
+        getImagesAndgenerateMyMosaic(4, 60, "heroes", "/tmp/test/input2.jpg");
+//        generateMyMosaic(4, 60, "heroes", "/tmp/test/input2.jpg");
 
 //        List<String> allMyBoardsInternalName = meAccessor.getAllMyBoardsInternalName();
 //        PinsData pinsFromBoard = boardAccessor.getAllPinsFromBoard(targetUser, allMyBoardsInternalName.get(1));
@@ -109,38 +124,108 @@ public class Main {
 
 
         //CLOSE START
-        am.closeAllAccessors();
+        accessorsManager.closeAllAccessors();
         //CLOSE END
 
         logger.info("Ended in Main");
     }
 
-    private static void use100x100(String inputImage, String outputImage) throws IOException, InterruptedException {
-        int scale = 4;
-        int size = 100;
-        String tilesDirectory = "/tmp/europeana-inspire/100x100-size/heroes";
-        logger.info("100x100 processing..");
-        MosaicGenerator mosaicGenerator = new MosaicGenerator(tilesDirectory, inputImage, outputImage, size, size, scale);
-        mosaicGenerator.generateMosaic();
+    private static void getImagesAndgenerateMyMosaic(int scale, int size, String boardName, String sourceImage) throws BadRequest, DoesNotExistException, IOException, URISyntaxException {
+        String targetBoard = boardName;
+        String scaleSubdirectory = null;
+        if(scale > 8 ) {
+            logger.error("Available scales: <= 8");
+            return;
+        }
+        switch (size)
+        {
+            case 100:
+                scaleSubdirectory = ImagesProcessor.directory100x100Name;
+                break;
+            case 60:
+                scaleSubdirectory = ImagesProcessor.directory60x60Name;
+                break;
+            case 40:
+                scaleSubdirectory = ImagesProcessor.directory40x40Name;
+                break;
+            default: {
+                logger.error("Available sizes : 100, 60, 40");
+                return;
+            }
+        }
+
+        //Download images from pinterest
+        PinsData pinsFromBoard = boardAccessor.getPinsFromBoard(targetUser, targetBoard);
+        ImagesProcessor.storeAllPins(manager.getRootStorageDirectory(), pinsFromBoard);
+
+        //Generate mosaic
+        String outputFileName = size + "x" + size + "-" + Tools.retrieveLastPathFromUrl(sourceImage);
+        String sourceTilesDirectory = Paths.get(manager.getRootStorageDirectory(), scaleSubdirectory, boardName).toString();
+        Path mosaicsDirectory = Paths.get(manager.getRootStorageDirectory(), ImagesProcessor.directoryMosaicsName);
+        String output = Paths.get(mosaicsDirectory.toString(), outputFileName).toString();
+
+        MosaicGeneratorBash.generateMosaic(scale, size, size, sourceTilesDirectory, sourceImage, output, (short) 10);
     }
 
-    private static void use60x60(String inputImage, String outputImage) throws IOException, InterruptedException {
-        int scale = 8;
-        int size = 60;
-        String tilesDirectory = "/tmp/europeana-inspire/60x60-size";
-        logger.info("60x60 processing..");
-        MosaicGenerator mosaicGenerator = new MosaicGenerator(tilesDirectory, inputImage, outputImage, size, size, scale);
-        mosaicGenerator.generateMosaic();
+    private static void generateMyMosaic(int scale, int size, String boardName, String sourceImage) throws BadRequest, DoesNotExistException, IOException, URISyntaxException {
+        String targetBoard = boardName;
+        String scaleSubdirectory = null;
+        if(scale > 8 ) {
+            logger.error("Available scales: <= 8");
+            return;
+        }
+        switch (size)
+        {
+            case 100:
+                scaleSubdirectory = ImagesProcessor.directory100x100Name;
+                break;
+            case 60:
+                scaleSubdirectory = ImagesProcessor.directory60x60Name;
+                break;
+            case 40:
+                scaleSubdirectory = ImagesProcessor.directory40x40Name;
+                break;
+            default: {
+                logger.error("Available sizes : 100, 60, 40");
+                return;
+            }
+        }
+
+        String outputFileName = size + "x" + size + "-" + Tools.retrieveLastPathFromUrl(sourceImage);
+        String sourceImageDirectory = Paths.get(manager.getRootStorageDirectory(), scaleSubdirectory, boardName).toString();
+        Path mosaicsDirectory = Paths.get(manager.getRootStorageDirectory(), ImagesProcessor.directoryMosaicsName);
+        Files.createDirectories(mosaicsDirectory);
+        String output = Paths.get(mosaicsDirectory.toString(), outputFileName).toString();
+
+        MosaicGeneratorBash.generateMosaic(scale, size, size, sourceImageDirectory, sourceImage, output, (short) 10);
     }
 
-    private static void use40x40(String inputImage, String outputImage) throws IOException, InterruptedException {
-        int scale = 10;
-        int size = 40;
-        String tilesDirectory = "/tmp/europeana-inspire/40x40-size";
-        logger.info("40x40 processing..");
-        MosaicGenerator mosaicGenerator = new MosaicGenerator(tilesDirectory, inputImage, outputImage, size, size, scale);
-        mosaicGenerator.generateMosaic();
-    }
+//    private static void use100x100(String inputImage, String outputImage) throws IOException, InterruptedException {
+//        int scale = 4;
+//        int size = 100;
+//        String tilesDirectory = "/tmp/europeana-inspire/100x100-size/heroes";
+//        logger.info("100x100 processing..");
+//        MosaicGenerator mosaicGenerator = new MosaicGenerator(tilesDirectory, inputImage, outputImage, size, size, scale);
+//        mosaicGenerator.generateMosaic();
+//    }
+//
+//    private static void use60x60(String inputImage, String outputImage) throws IOException, InterruptedException {
+//        int scale = 8;
+//        int size = 60;
+//        String tilesDirectory = "/tmp/europeana-inspire/60x60-size";
+//        logger.info("60x60 processing..");
+//        MosaicGenerator mosaicGenerator = new MosaicGenerator(tilesDirectory, inputImage, outputImage, size, size, scale);
+//        mosaicGenerator.generateMosaic();
+//    }
+//
+//    private static void use40x40(String inputImage, String outputImage) throws IOException, InterruptedException {
+//        int scale = 10;
+//        int size = 40;
+//        String tilesDirectory = "/tmp/europeana-inspire/40x40-size";
+//        logger.info("40x40 processing..");
+//        MosaicGenerator mosaicGenerator = new MosaicGenerator(tilesDirectory, inputImage, outputImage, size, size, scale);
+//        mosaicGenerator.generateMosaic();
+//    }
 
 
 }

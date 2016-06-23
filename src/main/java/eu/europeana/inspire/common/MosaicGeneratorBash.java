@@ -37,7 +37,9 @@ public class MosaicGeneratorBash {
 
     public static void prepareImages(int width, int height, String sourceImagesDirectory, String convertedImagesDirectory) throws IOException {
         Files.createDirectories(Paths.get(convertedImagesDirectory));
-        int totalFilesAlreadyConverted = new File(convertedImagesDirectory).list().length - 1; //-1 to remove the tables file
+        int totalFilesAlreadyConverted = 0;
+        if(new File(convertedImagesDirectory).list() != null)
+            totalFilesAlreadyConverted = new File(convertedImagesDirectory).list().length - 1; //-1 to remove the tables file
         int totalFilesFromSource = getFileNames(new ArrayList<>(), Paths.get(sourceImagesDirectory)).size();
 
         if(totalFilesAlreadyConverted == totalFilesFromSource)

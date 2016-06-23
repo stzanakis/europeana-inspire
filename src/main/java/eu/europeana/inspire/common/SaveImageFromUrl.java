@@ -1,4 +1,4 @@
-package eu.europeana.common;
+package eu.europeana.inspire.common;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
@@ -17,7 +17,6 @@ import java.nio.file.Paths;
 public class SaveImageFromUrl {
     private static final Logger logger = LogManager.getLogger();
     private String defaultDirectoryOfSavedImages;
-    private final String originalDir = "original-size";
 
     public SaveImageFromUrl(String defaultDirectoryOfSavedImages) {
         this.defaultDirectoryOfSavedImages = defaultDirectoryOfSavedImages;
@@ -30,12 +29,12 @@ public class SaveImageFromUrl {
 
     public File saveImage(String underDirectory, String imageUrl) throws IOException {
         String path = parsePathFromUrl(imageUrl);
-        Files.createDirectories(Paths.get(defaultDirectoryOfSavedImages, originalDir, underDirectory, path));
+        Files.createDirectories(Paths.get(defaultDirectoryOfSavedImages, ImagesProcessor.directoryOriginalSizeName, underDirectory, path));
 
         String fullName = FilenameUtils.getName(imageUrl);
 
         Path newFilePath = Paths.get(path, fullName);
-        String file = Paths.get(defaultDirectoryOfSavedImages, originalDir, underDirectory, newFilePath.toString()).toString();
+        String file = Paths.get(defaultDirectoryOfSavedImages, ImagesProcessor.directoryOriginalSizeName, underDirectory, newFilePath.toString()).toString();
         File destinationFile = new File(file);
         if(destinationFile.exists()) {
             logger.info("Did not re-download, image already exists!");

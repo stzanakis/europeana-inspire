@@ -1,12 +1,16 @@
 package eu.europeana.common;
 
 import eu.europeana.inspire.common.Configuration;
+import eu.europeana.inspire.common.ImagesProcessor;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
@@ -20,10 +24,17 @@ public class Manager {
     private static String defaultPropertiesPath;
     private String rootStorageDirectory;
 
-    public Manager(String defaultPropertiesPath) throws FileNotFoundException, ConfigurationException {
+    public Manager(String defaultPropertiesPath) throws IOException, ConfigurationException {
         this.defaultPropertiesPath = defaultPropertiesPath;
         PropertiesConfiguration propertiesConfigurationInspire = Configuration.loadConfiguration(Manager.getDefaultPropertiesPath(), Manager.getConfigurationFileName());
         rootStorageDirectory = propertiesConfigurationInspire.getProperty(Manager.getStorageDirectoryKey()).toString();
+
+        //Create required directories
+        Files.createDirectories(Paths.get(rootStorageDirectory, ImagesProcessor.directoryOriginalSizeName));
+        Files.createDirectories(Paths.get(rootStorageDirectory, ImagesProcessor.directory100x100Name));
+        Files.createDirectories(Paths.get(rootStorageDirectory, ImagesProcessor.directory60x60Name));
+        Files.createDirectories(Paths.get(rootStorageDirectory, ImagesProcessor.directory40x40Name));
+        Files.createDirectories(Paths.get(rootStorageDirectory, ImagesProcessor.directoryMosaicsName));
     }
 
     public static Logger getLogger() {

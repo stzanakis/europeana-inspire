@@ -1,6 +1,5 @@
 package eu.europeana.inspire.common;
 
-import eu.europeana.common.SaveImageFromUrl;
 import eu.europeana.common.Tools;
 import eu.europeana.model.Pin;
 import eu.europeana.model.PinsData;
@@ -14,7 +13,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -24,9 +22,11 @@ import java.nio.file.Paths;
  */
 public class ImagesProcessor {
     private static final Logger logger = LogManager.getLogger();
-    private static final String directory100x100Name = "100x100-size";
-    private static final String directory60x60Name = "60x60-size";
-    private static final String directory40x40Name = "40x40-size";
+    public static final String directoryOriginalSizeName = "original-size";
+    public static final String directory100x100Name = "100x100-size";
+    public static final String directory60x60Name = "60x60-size";
+    public static final String directory40x40Name = "40x40-size";
+    public static final String directoryMosaicsName = "mosaics";
 
     public static void storeAllPins(String rootStorageDirectory, PinsData pinsFromBoard) throws URISyntaxException, IOException {
         SaveImageFromUrl saveImageFromUrl = new SaveImageFromUrl(rootStorageDirectory);
@@ -66,11 +66,11 @@ public class ImagesProcessor {
 
     private static void resizeImages(String rootStorageDirectory, String sourceDirectory, String boardName) throws IOException {
         Path path100x100 = Paths.get(rootStorageDirectory, directory100x100Name, boardName);
-        Files.createDirectories(path100x100);
+//        Files.createDirectories(path100x100);
         Path path60x60 = Paths.get(rootStorageDirectory, directory60x60Name, boardName);
-        Files.createDirectories(path60x60);
+//        Files.createDirectories(path60x60);
         Path path40x40 = Paths.get(rootStorageDirectory, directory40x40Name, boardName);
-        Files.createDirectories(path40x40);
+//        Files.createDirectories(path40x40);
 
         MosaicGeneratorBash.prepareImages(100, 100, sourceDirectory, path100x100.toString());
         MosaicGeneratorBash.prepareImages(60, 60, sourceDirectory, path60x60.toString());
