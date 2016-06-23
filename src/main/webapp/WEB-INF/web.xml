@@ -14,7 +14,7 @@
 
     <servlet-mapping>
         <servlet-name>jersey-serlvet</servlet-name>
-        <url-pattern>/rest/*</url-pattern>
+        <url-pattern>/inspire/*</url-pattern>
     </servlet-mapping>
 
     <listener>
