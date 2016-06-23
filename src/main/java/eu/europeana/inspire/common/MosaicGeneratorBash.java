@@ -21,28 +21,42 @@ import java.util.List;
 public class MosaicGeneratorBash {
     private static final Logger logger = LogManager.getLogger();
 
-    public static void generateMosaic(int scale, int width, int height, ArrayList<String> imageLibrary, String inputImage, String outputImage){
+    public static int generateMosaic(int scale, int width, int height, ArrayList<String> imageLibrary, String inputImage, String outputImage){
         StringBuilder command = new StringBuilder("metapixel --metapixel --scale=" + scale + " --distance=0 --width=" + width + " --height=" + height);
+        int tileImagesNumber = 0;
         for (String library :
                 imageLibrary) {
             command.append(" --library=" + library);
+
+            //At the same loop, Caclulate the number of tile images that the result image will be created from
+            if (new File(library).list() != null)
+                tileImagesNumber += new File(library).list().length - 1; //-1 to remove the tables file
         }
 
         command.append(" " + inputImage + " " + outputImage);
         logger.info("Starting command: " + command);
         runBashCommand(command.toString());
+
+        return tileImagesNumber;
     }
 
-    public static void generateMosaic(int scale, int width, int height, ArrayList<String> imageLibrary, String inputImage, String outputImage, short cheatValue){
+    public static int generateMosaic(int scale, int width, int height, ArrayList<String> imageLibrary, String inputImage, String outputImage, short cheatValue) {
         StringBuilder command = new StringBuilder("metapixel --metapixel --cheat=" + cheatValue + " --scale=" + scale + " --distance=0 --width=" + width + " --height=" + height);
+        int tileImagesNumber = 0;
         for (String library :
                 imageLibrary) {
             command.append(" --library=" + library);
+
+            //At the same loop, Caclulate the number of tile images that the result image will be created from
+            if (new File(library).list() != null)
+                tileImagesNumber += new File(library).list().length - 1; //-1 to remove the tables file
         }
 
         command.append(" " + inputImage + " " + outputImage);
         logger.info("Starting command: " + command);
         runBashCommand(command.toString());
+
+        return tileImagesNumber;
     }
 
     public static void prepareImages(int width, int height, String sourceImagesDirectory, String convertedImagesDirectory) throws IOException {

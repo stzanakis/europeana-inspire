@@ -82,18 +82,22 @@ public class Main {
 //        generateMyMosaic(4, 60, "heroes", "/tmp/test/input2.jpg");
 
 
-        List<String> allMyBoardsInternalName = meAccessor.getAllMyBoardsInternalName(targetUser);
+//        List<String> allMyBoardsInternalName = meAccessor.getAllMyBoardsInternalName(targetUser);
 //        PinsData pinsFromBoard = boardAccessor.getAllPinsFromBoard(targetUser, allMyBoardsInternalName.get(1));
 //        ImagesProcessor.storeAllPins(manager.getRootStorageDirectory(), pinsFromBoard);
 
-        for (String boardName :
-                allMyBoardsInternalName) {
-            logger.info(boardName);
-            PinsData pinsFromBoard = boardAccessor.getAllPinsFromBoard(targetUser, boardName);
-            ImagesProcessor.storeAllPins(manager.getRootStorageDirectory(), pinsFromBoard);
+        ArrayList<String> libraries = new ArrayList<>();
+        libraries.add("/data/datastore/europeana-inspire/100x100-size/knights");
+        String output = "/data/datastore/europeana-inspire/mosaics/output.png";
+        int totalUniqueImages = MosaicGeneratorBash.generateMosaic(4, 100, 100, libraries, "/tmp/test/input.jpg", output, (short) 10);
 
-        }
-        //Generate until you fail...
+//        for (String boardName :
+//                allMyBoardsInternalName) {
+//            logger.info(boardName);
+//            PinsData pinsFromBoard = boardAccessor.getAllPinsFromBoard(targetUser, boardName);
+//            ImagesProcessor.storeAllPins(manager.getRootStorageDirectory(), pinsFromBoard);
+//        }
+
 //        String inputImage = "/tmp/test/input2.jpg";
 //        String outputImage = "/tmp/test/output.png";
 
