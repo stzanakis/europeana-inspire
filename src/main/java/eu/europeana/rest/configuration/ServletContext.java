@@ -17,7 +17,7 @@ public class ServletContext implements ServletContextListener
 {
     public static Manager manager;
     public static String targetUser = "europeana";
-    public static String hardcodedUrl = "http://chaos.eanadev.org:8080";
+    public static String hardcodedUrl = "http://chaos.eanadev.org";
 
     public void contextInitialized(ServletContextEvent arg0)
     {
