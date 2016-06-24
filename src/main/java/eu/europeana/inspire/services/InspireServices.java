@@ -31,6 +31,7 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
@@ -168,7 +169,17 @@ public class InspireServices {
         }
 
         //Generate mosaic
-        String outputFileName = scale + "-" + size + "x" + size + "-" + Tools.retrieveLastPathFromUrl(sourceImage);
+        int lastIndexOfDot = Tools.retrieveLastPathFromUrl(sourceImage).lastIndexOf(".");
+        String extension = null;
+        if(lastIndexOfDot != -1)
+            extension = Tools.retrieveLastPathFromUrl(sourceImage).substring(lastIndexOfDot);
+        String outputFileName;
+        if(extension != null) {
+            outputFileName = scale + "-" + size + "x" + size + "-" + Tools.retrieveLastPathFromUrl(sourceImage).substring(0, lastIndexOfDot) + "-"
+                    + UUID.randomUUID().toString() + extension;
+        }
+        else
+            outputFileName = scale + "-" + size + "x" + size + "-" + Tools.retrieveLastPathFromUrl(sourceImage) + "-" + UUID.randomUUID().toString();
         ArrayList<String> sourceTilesDirectories = new ArrayList<>();
         if(!targetBoard.equals("all-boards"))
             sourceTilesDirectories.add(Paths.get(ServletContext.manager.getRootStorageDirectory(), scaleSubdirectory, boardName).toString());
