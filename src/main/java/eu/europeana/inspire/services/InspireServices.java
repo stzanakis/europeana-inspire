@@ -133,7 +133,7 @@ public class InspireServices {
         String targetBoard = boardName;
         String scaleSubdirectory = null;
         if(scale > 20 ) {
-            logger.error("Available scales: <= 10");
+            logger.error("Available scales: <= 20");
             return null;
         }
         switch (size)
